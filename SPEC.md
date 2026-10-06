@@ -126,8 +126,18 @@ fields) opens the main page; the TOC fields cost nothing where the compartment d
 Key bindings (Options → Keybindings → ShoulderCam): "Toggle ShoulderCam" (flips Enabled) and
 "Swap shoulder" (flips Left shoulder).
 
+**Minimap button** (only where the client has both the action camera and the Settings API): a round
+button on the minimap edge, LibDBIcon's look, no library. Left-click opens the main page, right-click
+flips Enabled (same as the key binding), hover shows a three-line tooltip. Dragging it with the left
+button moves it around the edge; its angle is saved account-wide (`minimapAngle`, degrees, 0 = east,
+counter-clockwise, default 225 = bottom-left; not drawn on any page). The drag follows the cursor on a
+`C_Timer.NewTicker(0.02)` that runs only while the button is held and is cancelled on release or when the
+button hides. The frame is created the first time it must be shown, so a player who keeps it hidden never
+pays for it. "Show minimap button" shows and hides it live and never re-applies the camera. Placement is
+on a circle: on a square minimap the button sits inside the corners.
+
 Account-wide SavedVariables: `ShoulderCamDB`. On load each value is kept only if its type matches the
-default; slider values are also clamped to their range. Anything else falls back to the default.
+default and it is not NaN; slider values are also clamped to their range. Anything else falls back to the default.
 
 ### Main page
 
@@ -135,6 +145,7 @@ default; slider values are also clamped to their range. Anything else falls back
 | --- | --- | --- |
 | **General** | | |
 | Enabled | on | |
+| Show minimap button | on | |
 | Manual scroll speed | 20 | 1–50 / 1 |
 | Transition speed | 40 | 1–50 / 0.5 |
 | Max camera distance (yd) | 39 | 15–39 / 0.5 |
@@ -170,7 +181,7 @@ Settings of a disabled mode stay visible but greyed out.
 ## Performance rules (non-negotiable)
 
 1. No `OnUpdate` handlers. Timers only while something is moving (zoom transition stop, offset ticker,
-   remember-zoom stable-read poll), cancelled when done.
+   remember-zoom stable-read poll, minimap button drag), cancelled when done.
 2. No libraries.
 3. Mount/form events registered only while Mounted mode is on; combat events only while Combat mode is on.
 4. A mode switch writes only CVars whose value changes.
@@ -185,7 +196,7 @@ Settings of a disabled mode stay visible but greyed out.
   own movement, which has no easing curve. Offset animation is linear.
 - Switching modes early when a mount or harmful spell cast starts; waiting for player input before leaving
   combat mode. Modes switch on the state events above.
-- Importing settings from an installed ActionCamPlus. Profiles, per-character settings, minimap button.
+- Importing settings from an installed ActionCamPlus. Profiles, per-character settings.
 
 ## Tests (unit, plain Lua with stubbed WoW API)
 
@@ -194,7 +205,8 @@ Modes order, druid forms), event registration per enabled mode, unchanged-mode e
 skip-unchanged and skip-missing rules, zoom trigger rules (when it zooms / when not), transition start,
 stop, correction and cancel-by-manual-zoom, remember-zoom target binding / stable read / rounding /
 cancel-on-mode-change, offset ticker start/finish/retarget and sync duration, SavedState type check and
-clamping, Defaults reset, slash commands, key binding handlers, TOC load order and TOC icon.
+clamping, Defaults reset, slash commands, key binding handlers, minimap button (created on first show,
+click actions, drag ticker start/stop, no camera re-apply on its checkbox), TOC load order and TOC icon.
 
 ## Verify in game (cannot be unit-tested)
 
@@ -205,3 +217,6 @@ clamping, Defaults reset, slash commands, key binding handlers, TOC load order a
 - A mouse-wheel zoom during a ShoulderCam transition stops the transition movement.
 - 39 yd is reachable with factor 2.6 on Classic flavors.
 - `Settings.RegisterCanvasLayoutSubcategory` and the slider widget work on every flavor.
+- Minimap button: sits at the bottom-left of the minimap edge, left-click opens settings, right-click
+  toggles the camera, a drag moves it and the spot survives `/reload`, the checkbox hides and shows it.
+  On Classic flavors the border may sit about 3 px off (Retail texture layout on every flavor).

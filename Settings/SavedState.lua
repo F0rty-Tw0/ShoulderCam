@@ -10,16 +10,14 @@ local max, min = math.max, math.min
 local SavedState = {}
 
 -- The saved file is user-editable: keep a value only when its type matches
--- the default, clamp sliders into range, and fall back to the default otherwise.
+-- the default and is not NaN, clamp sliders into range, and fall back to the
+-- default otherwise.
 local function sanitize(entry, value)
-  if type(value) ~= type(entry.default) then
+  if type(value) ~= type(entry.default) or value ~= value then
     return entry.default
   end
   if entry.min == nil then
     return value
-  end
-  if value ~= value then
-    return entry.default
   end
   return min(max(value, entry.min), entry.max)
 end

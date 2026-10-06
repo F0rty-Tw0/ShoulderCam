@@ -15,4 +15,5 @@ All releases: **0.1.x (current)**
 - Settings for zoom speed, transition speed, max camera distance, shoulder side, focus strength and pitch strength.
 - Two settings pages under Options > AddOns > ShoulderCam, open with `/shouldercam` or `/shc` or from the addon menu. Defaults resets everything.
 - Key bindings to toggle ShoulderCam and to swap shoulders.
+- Minimap button: left-click opens the settings, right-click turns the camera on or off, drag it to move it around the minimap. Hide it with "Show minimap button".
 - Loads on WoW: Forever without being flagged as out of date.
