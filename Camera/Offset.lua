@@ -16,6 +16,7 @@ local OFFSET_TICK = Constants.OFFSET_TICK
 local Offset = {}
 
 local ticker
+local movingTo
 
 function Offset.Stop()
   if ticker then
@@ -25,9 +26,14 @@ function Offset.Stop()
 end
 
 -- Progress comes from GetTime(), so late ticks don't slow the curve; arrival
--- writes `target` itself, never a computed value.
+-- writes `target` itself, never a computed value. The same target again
+-- keeps the running animation, so a re-apply doesn't stretch it.
 function Offset.MoveTo(target, duration)
+  if ticker and target == movingTo and duration > 0 then
+    return
+  end
   Offset.Stop()
+  movingTo = target
   local from = tonumber(_G.GetCVar(OFFSET_CVAR))
   if duration <= 0 or from == nil or from == target then
     CVar.Set(OFFSET_CVAR, target)
