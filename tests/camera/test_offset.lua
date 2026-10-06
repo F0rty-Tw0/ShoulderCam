@@ -58,6 +58,29 @@ local function test_retarget_continues_from_current_value()
   Assert.equal(W.ActiveTimers(), 0)
 end
 
+local function test_same_target_keeps_running_animation()
+  local W = setup()
+  Offset.MoveTo(1, 2)
+  W.Advance(1)
+
+  Offset.MoveTo(1, 2)
+  W.Advance(1.1)
+
+  Assert.equal(W.cvars.test_cameraOverShoulder, "1")
+  Assert.equal(W.ActiveTimers(), 0)
+end
+
+local function test_same_target_with_zero_duration_snaps()
+  local W = setup()
+  Offset.MoveTo(1, 2)
+  W.Advance(1)
+
+  Offset.MoveTo(1, 0)
+
+  Assert.equal(W.cvars.test_cameraOverShoulder, "1")
+  Assert.equal(W.ActiveTimers(), 0)
+end
+
 local function test_zero_duration_sets_instantly()
   local W = setup()
 
@@ -96,6 +119,8 @@ return function()
   test_halfway_after_half_the_duration()
   test_arrives_exactly_and_cancels_ticker()
   test_retarget_continues_from_current_value()
+  test_same_target_keeps_running_animation()
+  test_same_target_with_zero_duration_snaps()
   test_zero_duration_sets_instantly()
   test_same_value_starts_no_ticker()
   test_stop_keeps_value_and_kills_ticker()
