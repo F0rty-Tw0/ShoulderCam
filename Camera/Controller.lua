@@ -120,6 +120,10 @@ function Controller.Apply(reason, key)
     return
   end
   local mode = Mode.Resolve(db, Mode.ReadState())
+  -- An event that keeps the mode (e.g. combat while mounted) has nothing to apply.
+  if reason == "event" and mode == activeMode then
+    return
+  end
   local changed = mode ~= activeMode
   if changed then
     ZoomMemory.Cancel()
