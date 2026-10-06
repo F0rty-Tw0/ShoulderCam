@@ -1,0 +1,38 @@
+## Interface: 120100
+## Interface-Mainline: 120100
+## Interface-Forever: 16001
+## Interface-Vanilla: 11509
+## Interface-Classic: 11509
+## Interface-TBC: 20506
+## Interface-BCC: 20506
+## Interface-Wrath: 30403
+## Interface-WOTLKC: 30403
+## Interface-Cata: 40402
+## Interface-Mists: 50504
+## Interface-MoP: 50504
+## Title: ShoulderCam
+## Notes: Lightweight action camera: over-the-shoulder view with separate on foot, combat and mounted modes, at a fraction of the CPU, memory and size.
+## Author: F0rty_tw0
+## Category: Camera
+## IconTexture: Interface\AddOns\ShoulderCam\Media\Icon
+## Version: v0.1.0
+## SavedVariables: ShoulderCamDB
+## AddonCompartmentFunc: ShoulderCam_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: ShoulderCam_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: ShoulderCam_OnAddonCompartmentLeave
+
+Core/FlavorCompat.lua
+Core/Constants.lua
+Core/Localization.lua
+Core/CVar.lua
+Core/SlashCommand.lua
+Settings/Defaults.lua
+Settings/SavedState.lua
+Camera/Mode.lua
+Camera/Offset.lua
+Camera/Zoom.lua
+Camera/ZoomMemory.lua
+Camera/Controller.lua
+Settings/Widgets.lua
+Settings/Panel.lua
+Bootstrap.lua
