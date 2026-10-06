@@ -112,6 +112,19 @@ local function test_addon_loaded_fills_every_default_once()
   end
 end
 
+-- A Lua error later in load must not leave the client saving the raw file.
+local function test_settings_are_saved_even_if_load_errors_later()
+  local W = setup({ enabled = false })
+  rawset(_G, "Minimap", {
+    GetWidth = function()
+      error("minimap not ready")
+    end,
+  })
+  pcall(W.Fire, "ADDON_LOADED", "ShoulderCam")
+  Assert.equal(_G.ShoulderCamDB.enabled, false, "saved choice kept")
+  Assert.equal(_G.ShoulderCamDB.scrollSpeed, 20, "the loaded table is the saved one")
+end
+
 local function test_slash_command_opens_main_category()
   local W = loaded()
   Assert.equal(_G.SLASH_SHOULDERCAM2, "/shc")
@@ -251,6 +264,7 @@ return function()
   test_load_without_game_event_does_not_error()
   test_other_addon_loading_is_ignored()
   test_addon_loaded_fills_every_default_once()
+  test_settings_are_saved_even_if_load_errors_later()
   test_slash_command_opens_main_category()
   test_toggle_binding_flips_enabled_and_turns_camera_off()
   test_swap_binding_flips_left_shoulder()
