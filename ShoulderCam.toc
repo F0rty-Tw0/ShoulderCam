@@ -10,7 +10,7 @@
 ## Interface-Cata: 40402
 ## Interface-Mists: 50504
 ## Interface-MoP: 50504
-## Title: ShoulderCam
+## Title: Shoulder Cam
 ## Notes: Lightweight action camera: over-the-shoulder view with separate on foot, combat and mounted modes, at a fraction of the CPU, memory and size.
 ## Author: F0rty_tw0
 ## Category: Camera

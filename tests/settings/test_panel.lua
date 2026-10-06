@@ -90,7 +90,7 @@ local function test_registers_main_category_and_situations_subcategory()
 
   Assert.equal(#ctx.W.categories, 2)
   Assert.equal(ctx.category, ctx.W.categories[1])
-  Assert.equal(ctx.category.name, "ShoulderCam")
+  Assert.equal(ctx.category.name, "Shoulder Cam")
   Assert.equal(ctx.W.addOnCategories[1], ctx.category)
   Assert.equal(ctx.W.categories[2].name, "Situations")
   Assert.equal(ctx.W.categories[2].parent, ctx.category)

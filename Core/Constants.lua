@@ -5,6 +5,8 @@ end
 
 local Constants = {
   VERSION = "v0.1.0",
+  -- Name players see; the folder, saved variables and slash commands keep "ShoulderCam".
+  DISPLAY_NAME = "Shoulder Cam",
 
   -- Zoom: a smaller difference to the target does nothing; after the
   -- transition timer, a remainder of at least this much is corrected.

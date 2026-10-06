@@ -3,12 +3,13 @@ if type(ns) ~= "table" then
   ns = {}
 end
 
+local Constants = ns.Constants or require("ShoulderCam.Core.Constants")
 local Defaults = ns.Defaults or require("ShoulderCam.Settings.Defaults")
 local FlavorCompat = ns.FlavorCompat or require("ShoulderCam.Core.FlavorCompat")
 local Localization = ns.Localization or require("ShoulderCam.Core.Localization")
 local Widgets = ns.Widgets or require("ShoulderCam.Settings.Widgets")
 
-local CATEGORY_NAME = "ShoulderCam"
+local CATEGORY_NAME = Localization.Text(Constants.DISPLAY_NAME)
 local DEFAULTS_KEY = "*defaults"
 local LEFT = 16
 local TOP = -16

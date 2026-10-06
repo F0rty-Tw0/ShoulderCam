@@ -3,6 +3,7 @@ if type(ns) ~= "table" then
   ns = {}
 end
 
+local Constants = ns.Constants or require("ShoulderCam.Core.Constants")
 local Localization = ns.Localization or require("ShoulderCam.Core.Localization")
 
 local cos, sin, rad, deg = math.cos, math.sin, math.rad, math.deg
@@ -78,7 +79,7 @@ end
 local function showTooltip(self)
   local tooltip = _G.GameTooltip
   tooltip:SetOwner(self, "ANCHOR_LEFT")
-  tooltip:SetText(Localization.Text("ShoulderCam"))
+  tooltip:SetText(Localization.Text(Constants.DISPLAY_NAME))
   tooltip:AddLine(Localization.Text("Left-click: settings"))
   tooltip:AddLine(Localization.Text("Right-click: toggle on/off"))
   tooltip:Show()

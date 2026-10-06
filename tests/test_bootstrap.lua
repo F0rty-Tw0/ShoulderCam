@@ -160,8 +160,8 @@ end
 
 local function test_binding_labels_are_set()
   setup()
-  Assert.equal(_G.BINDING_HEADER_SHOULDERCAM, "ShoulderCam")
-  Assert.equal(_G.BINDING_NAME_SHOULDERCAM_TOGGLE, "Toggle ShoulderCam")
+  Assert.equal(_G.BINDING_HEADER_SHOULDERCAM, "Shoulder Cam")
+  Assert.equal(_G.BINDING_NAME_SHOULDERCAM_TOGGLE, "Toggle Shoulder Cam")
   Assert.equal(_G.BINDING_NAME_SHOULDERCAM_SWAP, "Swap shoulder")
 end
 
@@ -183,7 +183,7 @@ local function test_compartment_hover_shows_and_hides_tooltip()
   _G.ShoulderCam_OnAddonCompartmentEnter(nil, button)
   local tooltip = _G.GameTooltip
   Assert.equal(tooltip.owner, button)
-  Assert.equal(tooltip.text, "ShoulderCam")
+  Assert.equal(tooltip.text, "Shoulder Cam")
   Assert.equal(tooltip.lines[1], "Click to open settings.")
   Assert.equal(tooltip:IsShown(), true)
   _G.ShoulderCam_OnAddonCompartmentLeave()

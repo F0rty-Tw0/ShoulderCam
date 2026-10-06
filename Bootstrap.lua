@@ -4,6 +4,7 @@ if type(ns) ~= "table" then
 end
 
 local Controller = ns.Controller or require("ShoulderCam.Camera.Controller")
+local Constants = ns.Constants or require("ShoulderCam.Core.Constants")
 local FlavorCompat = ns.FlavorCompat or require("ShoulderCam.Core.FlavorCompat")
 local Localization = ns.Localization or require("ShoulderCam.Core.Localization")
 local MinimapButton = ns.MinimapButton or require("ShoulderCam.Settings.MinimapButton")
@@ -86,8 +87,8 @@ function Bootstrap.Initialize(saved)
   return db
 end
 
-_G.BINDING_HEADER_SHOULDERCAM = Localization.Text(ADDON_NAME)
-_G.BINDING_NAME_SHOULDERCAM_TOGGLE = Localization.Text("Toggle ShoulderCam")
+_G.BINDING_HEADER_SHOULDERCAM = Localization.Text(Constants.DISPLAY_NAME)
+_G.BINDING_NAME_SHOULDERCAM_TOGGLE = Localization.Text("Toggle Shoulder Cam")
 _G.BINDING_NAME_SHOULDERCAM_SWAP = Localization.Text("Swap shoulder")
 
 _G.ShoulderCam_ToggleEnabled = toggleEnabled
@@ -102,7 +103,7 @@ _G.ShoulderCam_OnAddonCompartmentClick = openSettings
 function _G.ShoulderCam_OnAddonCompartmentEnter(_, button)
   local tooltip = _G.GameTooltip
   tooltip:SetOwner(button, "ANCHOR_LEFT")
-  tooltip:SetText(Localization.Text(ADDON_NAME))
+  tooltip:SetText(Localization.Text(Constants.DISPLAY_NAME))
   tooltip:AddLine(Localization.Text("Click to open settings."))
   tooltip:Show()
 end

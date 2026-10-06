@@ -1,8 +1,8 @@
 <Bindings>
-  <Binding name="SHOULDERCAM_TOGGLE" header="SHOULDERCAM" category="ShoulderCam">
+  <Binding name="SHOULDERCAM_TOGGLE" header="SHOULDERCAM" category="Shoulder Cam">
     ShoulderCam_ToggleEnabled()
   </Binding>
-  <Binding name="SHOULDERCAM_SWAP" category="ShoulderCam">
+  <Binding name="SHOULDERCAM_SWAP" category="Shoulder Cam">
     ShoulderCam_SwapShoulder()
   </Binding>
 </Bindings>
