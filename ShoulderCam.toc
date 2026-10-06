@@ -35,4 +35,5 @@ Camera/ZoomMemory.lua
 Camera/Controller.lua
 Settings/Widgets.lua
 Settings/Panel.lua
+Settings/MinimapButton.lua
 Bootstrap.lua

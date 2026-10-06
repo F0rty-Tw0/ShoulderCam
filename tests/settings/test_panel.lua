@@ -47,6 +47,9 @@ for _, name in ipairs({ "Checkbox", "Slider" }) do
   end
 end
 
+local CHECKBOX_HEIGHT = 26
+local SLIDER_OFFSET_Y = -16
+
 -- key -> Blizzard frame of every setting widget built on `page`.
 local function widgetsOn(_ctx, page)
   local byKey, count = {}, 0
@@ -61,11 +64,12 @@ local function widgetsOn(_ctx, page)
   return byKey, count
 end
 
+-- Keys drawn on a page: entries without a label are stored only.
 local function keysOfPage(pageName)
   local keys, page = {}, nil
   for _, entry in ipairs(Defaults.list) do
     page = entry.page or page
-    if entry.key and page == pageName then
+    if entry.key and entry.label and page == pageName then
       keys[#keys + 1] = entry.key
     end
   end
@@ -112,6 +116,21 @@ local function test_main_page_lists_every_main_key_once()
   local ctx = setup()
   show(mainPage(ctx))
   assertListsEveryKey(ctx, mainPage(ctx), "main")
+end
+
+local function test_entry_without_label_draws_no_widget()
+  local ctx = setup()
+  show(mainPage(ctx))
+  Assert.equal(Defaults.byKey.minimapAngle.label, nil, "minimapAngle is stored only")
+  Assert.equal(widgetsOn(ctx, mainPage(ctx)).minimapAngle, nil)
+end
+
+local function test_entry_without_label_takes_no_row()
+  local ctx = setup()
+  show(mainPage(ctx))
+  local byKey = widgetsOn(ctx, mainPage(ctx))
+  local rowY = byKey.minimapButton.point[5]
+  Assert.equal(byKey.scrollSpeed.point[5], rowY - CHECKBOX_HEIGHT + SLIDER_OFFSET_Y, "slider right below the checkbox")
 end
 
 local function test_situations_page_lists_every_situation_key_in_three_columns()
@@ -265,6 +284,8 @@ return function()
   test_registers_main_category_and_situations_subcategory()
   test_nothing_built_before_first_show()
   test_main_page_lists_every_main_key_once()
+  test_entry_without_label_draws_no_widget()
+  test_entry_without_label_takes_no_row()
   test_situations_page_lists_every_situation_key_in_three_columns()
   test_checkbox_click_writes_db_and_reports_key()
   test_slider_change_writes_db()
