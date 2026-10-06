@@ -94,10 +94,15 @@ local function addFrameMethods(widget)
   function widget:ClearAllPoints()
     self.point = nil
   end
+  -- Like the client, showing a hidden frame runs its OnShow script and
+  -- hiding a shown frame runs its OnHide script.
   function widget:Show()
+    local wasShown = self.shown
     self.shown = true
+    if not wasShown and self.scripts.OnShow then
+      self.scripts.OnShow(self)
+    end
   end
-  -- Like the client, hiding a shown frame runs its OnHide script.
   function widget:Hide()
     local wasShown = self.shown
     self.shown = false
