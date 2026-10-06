@@ -8,7 +8,6 @@ ignore:
   - scripts
   - archive
   - docs
-  - screenshots
   - dist
   - .editorconfig
   - .gitattributes

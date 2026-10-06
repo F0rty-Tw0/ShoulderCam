@@ -1,10 +1,12 @@
+<p align="center"><img src=".github/assets/shoulder-cam.png" alt="ShoulderCam logo" width="160"></p>
+
 <h1 align="center">ShoulderCam</h1>
 
 <p align="center"><b>Over-the-shoulder action camera with separate on foot, combat and mounted setups, and nothing that slows your game down.</b></p>
 
 <p align="center">
-  <img src="screenshots/camera-on-foot.jpg" alt="ShoulderCam camera on foot" width="49%">
-  <img src="screenshots/camera-on-foot-2.jpg" alt="ShoulderCam camera on foot, another angle" width="49%">
+  <img src=".github/assets/camera-on-foot.jpg" alt="ShoulderCam camera on foot" width="49%">
+  <img src=".github/assets/camera-on-foot-2.jpg" alt="ShoulderCam camera on foot, another angle" width="49%">
 </p>
 
 ## Why players install it
@@ -24,8 +26,8 @@ Options > AddOns > ShoulderCam, or type `/shouldercam` (or `/shc`). Every change
 - **Situations** page: On foot, Combat and Mounted side by side. Druid travel forms can count as mounted.
 
 <p align="center">
-  <img src="screenshots/settings-main.png" alt="ShoulderCam settings page" width="49%">
-  <img src="screenshots/settings-situations.png" alt="ShoulderCam Situations page" width="49%">
+  <img src=".github/assets/settings-main.png" alt="ShoulderCam settings page" width="49%">
+  <img src=".github/assets/settings-situations.png" alt="ShoulderCam Situations page" width="49%">
 </p>
 
 The **Defaults** button on either page resets everything. Key bindings (Options > Keybindings > ShoulderCam): **Toggle ShoulderCam** and **Swap shoulder**. The addon menu button on the minimap (Retail) opens the settings too.
