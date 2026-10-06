@@ -46,6 +46,8 @@ globals = {
 
 -- Globals the addon READS (WoW API surface used by this addon)
 read_globals = {
+  "StaticPopup_Hide",
+
   -- Frames and hooks
   "CreateFrame",
   "UIParent",

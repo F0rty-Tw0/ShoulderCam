@@ -54,6 +54,23 @@ local function test_game_event_popup_handler_is_replaced_when_present()
   Assert.equal(calls, 0, "original never runs")
 end
 
+-- The client can fire the warning at login before addons load.
+local function test_popup_already_shown_at_load_is_hidden()
+  local hidden = {}
+  rawset(_G, "StaticPopup_Hide", function(which)
+    hidden[#hidden + 1] = which
+  end)
+  setup()
+  rawset(_G, "StaticPopup_Hide", nil)
+  Assert.equal(hidden[1], "EXPERIMENTAL_CVAR_WARNING")
+end
+
+local function test_load_without_static_popup_does_not_error()
+  rawset(_G, "StaticPopup_Hide", nil)
+  setup()
+  Assert.equal(_G.StaticPopup_Hide, nil)
+end
+
 local function test_load_without_game_event_does_not_error()
   setup(nil, nil)
   Assert.equal(_G.GameEvent, nil)
@@ -150,6 +167,8 @@ end
 return function()
   test_popup_event_is_unregistered_on_ui_parent()
   test_game_event_popup_handler_is_replaced_when_present()
+  test_popup_already_shown_at_load_is_hidden()
+  test_load_without_static_popup_does_not_error()
   test_load_without_game_event_does_not_error()
   test_other_addon_loading_is_ignored()
   test_addon_loaded_fills_every_default_once()
