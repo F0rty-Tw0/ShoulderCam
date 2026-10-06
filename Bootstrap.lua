@@ -71,6 +71,9 @@ end
 
 function Bootstrap.Initialize(saved)
   db = SavedState.Initialize(saved)
+  -- Saved before anything else runs: a later Lua error must not leave the
+  -- client writing back the raw file and losing this session's changes.
+  _G.ShoulderCamDB = db
   Controller.Install(db)
   Panel.Register(db, onSettingChanged)
   Controller.onRemembered = Panel.Refresh
@@ -115,7 +118,7 @@ loader:SetScript("OnEvent", function(self, _event, loadedName)
     return
   end
   self:UnregisterEvent("ADDON_LOADED")
-  _G.ShoulderCamDB = Bootstrap.Initialize(_G.ShoulderCamDB)
+  Bootstrap.Initialize(_G.ShoulderCamDB)
 end)
 
 ns.Bootstrap = Bootstrap
