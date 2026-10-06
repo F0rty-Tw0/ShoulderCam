@@ -64,7 +64,9 @@ strength CVars from the global sliders, and `cameraDistanceMaxZoomFactor` = max 
 The "experimental feature" confirmation popup is suppressed at load:
 `UIParent:UnregisterEvent("EXPERIMENTAL_CVAR_CONFIRMATION_NEEDED")` (wrapped in `pcall`), and on Retail
 `GameEvent.HandleExperimentalCVarConfirmationNeeded` is replaced with a no-op when it exists — the
-same two lines ActionCamPlus uses (`ActionCamPlus.lua:347-348`).
+same two lines ActionCamPlus uses (`ActionCamPlus.lua:347-348`). The client can fire the event at
+login before addons load, so a `EXPERIMENTAL_CVAR_WARNING` popup already shown is closed with
+`StaticPopup_Hide` (never its Disable button, which resets the camera CVars).
 
 ## Zoom
 

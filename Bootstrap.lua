@@ -11,6 +11,7 @@ local SlashCommand = ns.SlashCommand or require("ShoulderCam.Core.SlashCommand")
 
 local ADDON_NAME = "ShoulderCam"
 local POPUP_EVENT = "EXPERIMENTAL_CVAR_CONFIRMATION_NEEDED"
+local POPUP_DIALOG = "EXPERIMENTAL_CVAR_WARNING"
 
 -- Addon entry point: popup suppression, init on ADDON_LOADED, key binding
 -- and AddOn Compartment globals (SPEC.md → Settings).
@@ -24,6 +25,12 @@ pcall(_G.UIParent.UnregisterEvent, _G.UIParent, POPUP_EVENT)
 local gameEvent = _G.GameEvent
 if type(gameEvent) == "table" then
   gameEvent.HandleExperimentalCVarConfirmationNeeded = function() end
+end
+-- The client can fire the event at login before addons load: close a popup
+-- already up. Hiding skips its Disable button, which resets the camera CVars.
+local hidePopup = _G.StaticPopup_Hide
+if hidePopup then
+  hidePopup(POPUP_DIALOG)
 end
 
 local function openSettings()
