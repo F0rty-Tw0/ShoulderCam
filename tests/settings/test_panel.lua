@@ -112,6 +112,18 @@ local function test_nothing_built_before_first_show()
   Assert.equal(select(2, widgetsOn(ctx, situationsPage(ctx))), 0, "situations waits for its own show")
 end
 
+-- The settings window shows a page with frame:Show(); that must run OnShow
+-- even when the page was never shown before.
+local function test_first_show_by_settings_window_builds_page()
+  local ctx = setup()
+
+  mainPage(ctx):Show()
+  situationsPage(ctx):Show()
+
+  Assert.equal(select(2, widgetsOn(ctx, mainPage(ctx))) > 0, true, "main page built")
+  Assert.equal(select(2, widgetsOn(ctx, situationsPage(ctx))) > 0, true, "situations page built")
+end
+
 local function test_main_page_lists_every_main_key_once()
   local ctx = setup()
   show(mainPage(ctx))
@@ -283,6 +295,7 @@ end
 return function()
   test_registers_main_category_and_situations_subcategory()
   test_nothing_built_before_first_show()
+  test_first_show_by_settings_window_builds_page()
   test_main_page_lists_every_main_key_once()
   test_entry_without_label_draws_no_widget()
   test_entry_without_label_takes_no_row()
