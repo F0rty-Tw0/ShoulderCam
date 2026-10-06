@@ -29,15 +29,34 @@ local function test_enter_world_on_foot_applies_defaults()
   Assert.equal(W.log[#W.log].args[1], 2)
 end
 
-local function test_same_mode_reapply_writes_nothing()
+local function test_same_mode_setting_reapply_writes_nothing()
   local W = Helper.setup()
   W.Fire("PLAYER_ENTERING_WORLD")
   Helper.clearLogs(W)
 
-  Controller.Apply("event")
+  Controller.Apply("setting", "focusYaw")
 
   Assert.equal(#W.setCVarCalls, 0)
   Assert.equal(#W.log, 0)
+end
+
+local function test_event_with_unchanged_mode_reads_no_cvar()
+  local W = Helper.setup({ mountedEnabled = true, combatEnabled = true })
+  W.mounted = true
+  W.Fire("PLAYER_ENTERING_WORLD")
+  Helper.clearLogs(W)
+  local reads = 0
+  local getCVar = _G.GetCVar
+  _G.GetCVar = function(name)
+    reads = reads + 1
+    return getCVar(name)
+  end
+
+  W.inCombat = true
+  W.Fire("PLAYER_REGEN_DISABLED")
+
+  Assert.equal(reads, 0)
+  Assert.equal(#W.setCVarCalls, 0)
 end
 
 local function test_install_only_writes_scroll_speed()
@@ -158,7 +177,8 @@ end
 
 return function()
   test_enter_world_on_foot_applies_defaults()
-  test_same_mode_reapply_writes_nothing()
+  test_same_mode_setting_reapply_writes_nothing()
+  test_event_with_unchanged_mode_reads_no_cvar()
   test_install_only_writes_scroll_speed()
   test_scroll_speed_change_writes_zoom_speed()
   test_off_resets_cvars_and_cancels_timers()

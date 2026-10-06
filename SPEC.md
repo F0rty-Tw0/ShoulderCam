@@ -40,6 +40,10 @@ are unregistered. Registration is recomputed on load and on every change to Enab
 enabled, Mounted mode enabled or "Druid travel forms count as mounted". When Enabled is off, only
 `PLAYER_ENTERING_WORLD` stays registered.
 
+A mode-switching event that resolves to the already active mode does nothing (no CVar read or write,
+running zoom, offset and remember-zoom timers untouched). `PLAYER_ENTERING_WORLD` and settings changes
+always apply in full.
+
 Applying a mode sets, from that mode's settings:
 
 | Mode setting | Effect |
@@ -57,7 +61,7 @@ change zoom distance.
 Every CVar write goes through one helper that skips CVars the client doesn't have (`GetCVar(name) == nil`)
 and values that are already set.
 
-Whenever the addon is not Off it also sets, on every apply: `CameraKeepCharacterCentered` 0,
+Whenever the addon is not Off it also sets, on every apply (not on an event skipped as above): `CameraKeepCharacterCentered` 0,
 `CameraReduceUnexpectedMovement` 0 (Blizzard blocks the action camera otherwise), the focus and pitch
 strength CVars from the global sliders, and `cameraDistanceMaxZoomFactor` = max distance / 15.
 
@@ -186,7 +190,7 @@ Settings of a disabled mode stay visible but greyed out.
 ## Tests (unit, plain Lua with stubbed WoW API)
 
 Following MouseOverTooltip's TDD rules, unit tests must cover at least: mode selection (every row of the
-Modes order, druid forms), event registration per enabled mode, CVar writes per mode including the
+Modes order, druid forms), event registration per enabled mode, unchanged-mode event skip, CVar writes per mode including the
 skip-unchanged and skip-missing rules, zoom trigger rules (when it zooms / when not), transition start,
 stop, correction and cancel-by-manual-zoom, remember-zoom target binding / stable read / rounding /
 cancel-on-mode-change, offset ticker start/finish/retarget and sync duration, SavedState type check and
