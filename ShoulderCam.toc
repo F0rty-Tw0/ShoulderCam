@@ -17,6 +17,7 @@
 ## IconTexture: Interface\AddOns\ShoulderCam\Media\Icon
 ## Version: v0.1.0
 ## SavedVariables: ShoulderCamDB
+## X-Curse-Project-ID: 1730929
 ## AddonCompartmentFunc: ShoulderCam_OnAddonCompartmentClick
 ## AddonCompartmentFuncOnEnter: ShoulderCam_OnAddonCompartmentEnter
 ## AddonCompartmentFuncOnLeave: ShoulderCam_OnAddonCompartmentLeave
