@@ -6,8 +6,20 @@ local Offset = require("ShoulderCam.Camera.Offset")
 local Zoom = require("ShoulderCam.Camera.Zoom")
 local ZoomMemory = require("ShoulderCam.Camera.ZoomMemory")
 local Controller = require("ShoulderCam.Camera.Controller")
+local Widgets = require("ShoulderCam.Settings.Widgets")
 
 local POPUP_EVENT = "EXPERIMENTAL_CVAR_CONFIRMATION_NEEDED"
+local BUTTON_NAME = "ShoulderCamMinimapButton"
+
+-- key -> Blizzard frame of the latest checkbox the panel built for it.
+local checkboxes = {}
+local createCheckbox = Widgets.Checkbox
+---@diagnostic disable-next-line: duplicate-set-field
+Widgets.Checkbox = function(...)
+  local widget = createCheckbox(...)
+  checkboxes[widget.key] = widget.frame
+  return widget
+end
 
 -- Fresh fake client, then Bootstrap and Panel loaded again (both keep module
 -- state). `gameEvent` is the GameEvent table present at load, or nil.
@@ -22,6 +34,7 @@ local function setup(saved, gameEvent)
   rawset(_G, "ShoulderCamDB", saved)
   Controller.onRemembered = nil
   package.loaded["Settings.Panel"] = nil
+  package.loaded["Settings.MinimapButton"] = nil
   package.loaded["Bootstrap"] = nil
   require("ShoulderCam.Bootstrap")
   return W
@@ -99,6 +112,19 @@ local function test_addon_loaded_fills_every_default_once()
   end
 end
 
+-- A Lua error later in load must not leave the client saving the raw file.
+local function test_settings_are_saved_even_if_load_errors_later()
+  local W = setup({ enabled = false })
+  rawset(_G, "Minimap", {
+    GetWidth = function()
+      error("minimap not ready")
+    end,
+  })
+  pcall(W.Fire, "ADDON_LOADED", "ShoulderCam")
+  Assert.equal(_G.ShoulderCamDB.enabled, false, "saved choice kept")
+  Assert.equal(_G.ShoulderCamDB.scrollSpeed, 20, "the loaded table is the saved one")
+end
+
 local function test_slash_command_opens_main_category()
   local W = loaded()
   Assert.equal(_G.SLASH_SHOULDERCAM2, "/shc")
@@ -164,6 +190,72 @@ local function test_compartment_hover_shows_and_hides_tooltip()
   Assert.equal(tooltip:IsShown(), false)
 end
 
+local function minimapButton()
+  return _G[BUTTON_NAME]
+end
+
+local function test_minimap_left_click_opens_main_category()
+  local W = loaded()
+  minimapButton().scripts.OnClick(minimapButton(), "LeftButton")
+  Assert.equal(W.openedCategory, W.categories[1]:GetID())
+end
+
+local function test_minimap_right_click_flips_enabled()
+  loaded()
+  minimapButton().scripts.OnClick(minimapButton(), "RightButton")
+  Assert.equal(_G.ShoulderCamDB.enabled, false)
+end
+
+local function test_no_minimap_button_without_action_cam()
+  local W = setup()
+  FlavorCompat.hasActionCam = false
+  W.Fire("ADDON_LOADED", "ShoulderCam")
+  Assert.equal(minimapButton(), nil)
+end
+
+local function test_no_minimap_button_without_settings_api()
+  local W = setup()
+  FlavorCompat.hasSettingsApi = false
+  W.Fire("ADDON_LOADED", "ShoulderCam")
+  Assert.equal(minimapButton(), nil)
+end
+
+-- The unavailable page's Defaults button reports "*defaults" too.
+local function test_defaults_without_action_cam_does_not_error()
+  local W = setup({ scrollSpeed = 10 })
+  FlavorCompat.hasActionCam = false
+  W.Fire("ADDON_LOADED", "ShoulderCam")
+  W.categories[1].frame.OnDefault()
+  Assert.equal(_G.ShoulderCamDB.scrollSpeed, 20)
+end
+
+local function test_minimap_checkbox_hides_button_without_touching_camera()
+  local W = loaded()
+  W.categories[1].frame.scripts.OnShow(W.categories[1].frame)
+  local cameraChanges = 0
+  local onSettingChanged = Controller.OnSettingChanged
+  ---@diagnostic disable-next-line: duplicate-set-field
+  Controller.OnSettingChanged = function(...)
+    cameraChanges = cameraChanges + 1
+    return onSettingChanged(...)
+  end
+  checkboxes.minimapButton:Click()
+  Controller.OnSettingChanged = onSettingChanged
+  Assert.equal(minimapButton():IsShown(), false)
+  Assert.equal(cameraChanges, 0)
+end
+
+local function test_defaults_shows_hidden_minimap_button_again()
+  local W = loaded({ minimapButton = true, minimapAngle = 90 })
+  W.categories[1].frame.scripts.OnShow(W.categories[1].frame)
+  checkboxes.minimapButton:Click()
+
+  W.categories[1].frame.OnDefault()
+
+  Assert.equal(minimapButton():IsShown(), true)
+  Assert.equal(_G.ShoulderCamDB.minimapAngle, 225)
+end
+
 return function()
   test_popup_event_is_unregistered_on_ui_parent()
   test_game_event_popup_handler_is_replaced_when_present()
@@ -172,6 +264,7 @@ return function()
   test_load_without_game_event_does_not_error()
   test_other_addon_loading_is_ignored()
   test_addon_loaded_fills_every_default_once()
+  test_settings_are_saved_even_if_load_errors_later()
   test_slash_command_opens_main_category()
   test_toggle_binding_flips_enabled_and_turns_camera_off()
   test_swap_binding_flips_left_shoulder()
@@ -180,4 +273,11 @@ return function()
   test_compartment_click_opens_main_category()
   test_compartment_click_before_load_does_not_error()
   test_compartment_hover_shows_and_hides_tooltip()
+  test_minimap_left_click_opens_main_category()
+  test_minimap_right_click_flips_enabled()
+  test_no_minimap_button_without_action_cam()
+  test_no_minimap_button_without_settings_api()
+  test_defaults_without_action_cam_does_not_error()
+  test_minimap_checkbox_hides_button_without_touching_camera()
+  test_defaults_shows_hidden_minimap_button_again()
 end

@@ -82,7 +82,7 @@ local function buildPage(frame, pageName, title)
       if entry.header then
         addText(frame, "GameFontNormal", Localization.Text(entry.header), x, y + HEADER_OFFSET_Y)
         y = y - HEADER_HEIGHT
-      elseif entry.key then
+      elseif entry.key and entry.label then
         y = y - addWidget(frame, entry, x, y)
       end
     end
@@ -117,6 +117,10 @@ end
 
 local function newPage(build)
   local frame = _G.CreateFrame("Frame")
+  -- New frames start shown. The settings window shows a page by reparenting
+  -- it and calling Show(); on an already-shown page OnShow never fires when
+  -- the window was showing another addon's page, so the page stayed empty.
+  frame:Hide()
   local built = false
   frame:SetScript("OnShow", function(self)
     if not built then

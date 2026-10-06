@@ -10,6 +10,7 @@ end
 --   { column = 2 }                    starts the main page's right column
 --   { key, default, label }           checkbox
 --   { key, default, label, min, max, step }  slider
+--   { key, default }                  stored only, never drawn
 -- On the Situations page `mode` places an entry in its column; `modeToggle`
 -- marks the mode's own switch, which is never greyed out.
 -- Labels are English source text; the pages pass them through Localization.Text.
@@ -18,6 +19,9 @@ local Defaults = {
     { page = "main" },
     { header = "General" },
     { key = "enabled", default = true, label = "Enabled" },
+    { key = "minimapButton", default = true, label = "Show minimap button" },
+    -- Degrees around the minimap, 0 = east, counter-clockwise; set by dragging.
+    { key = "minimapAngle", default = 225 },
     { key = "scrollSpeed", default = 20, label = "Manual scroll speed", min = 1, max = 50, step = 1 },
     { key = "transitionSpeed", default = 40, label = "Transition speed", min = 1, max = 50, step = 0.5 },
     { key = "maxDistance", default = 39, label = "Max camera distance (yd)", min = 15, max = 39, step = 0.5 },

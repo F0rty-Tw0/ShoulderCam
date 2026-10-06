@@ -4,6 +4,8 @@ local Defaults = require("ShoulderCam.Settings.Defaults")
 -- SPEC.md → Settings, one row per key: { key, default, min, max, step }.
 local SPEC = {
   { "enabled", true },
+  { "minimapButton", true },
+  { "minimapAngle", 225 },
   { "scrollSpeed", 20, 1, 50, 1 },
   { "transitionSpeed", 40, 1, 50, 0.5 },
   { "maxDistance", 39, 15, 39, 0.5 },
@@ -51,8 +53,23 @@ local function test_every_default_and_range_matches_spec()
     Assert.equal(entry.min, row[3], key .. ".min")
     Assert.equal(entry.max, row[4], key .. ".max")
     Assert.equal(entry.step, row[5], key .. ".step")
-    Assert.equal(type(entry.label), "string", key .. ".label")
+    -- minimapAngle is the one stored-only key (the drag saves it).
+    if key ~= "minimapAngle" then
+      Assert.equal(type(entry.label), "string", key .. ".label")
+    end
   end
+end
+
+local function test_minimap_entries_follow_enabled_in_general()
+  local index = {}
+  for i, entry in ipairs(Defaults.list) do
+    if entry.key then
+      index[entry.key] = i
+    end
+  end
+  Assert.equal(index.minimapButton, index.enabled + 1)
+  Assert.equal(index.minimapAngle, index.enabled + 2)
+  Assert.equal(Defaults.byKey.minimapButton.label, "Show minimap button")
 end
 
 local function test_list_has_no_keys_beyond_spec()
@@ -110,6 +127,7 @@ end
 return function()
   test_every_default_and_range_matches_spec()
   test_list_has_no_keys_beyond_spec()
+  test_minimap_entries_follow_enabled_in_general()
   test_situation_entries_name_their_column()
   test_only_mode_switches_are_mode_toggles()
   test_pages_split_main_and_situations()

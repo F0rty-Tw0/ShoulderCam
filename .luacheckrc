@@ -56,6 +56,8 @@ read_globals = {
   "Settings",
   "MinimalSliderWithSteppersMixin",
   "CreateMinimalSliderFormatter",
+  "Minimap",
+  "GetCursorPosition",
 
   -- Timers and client info
   "GetTime",

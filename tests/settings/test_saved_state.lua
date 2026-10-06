@@ -39,6 +39,22 @@ local function test_nan_slider_falls_back_to_default()
   Assert.equal(db.transitionSpeed, 40)
 end
 
+local function test_nan_number_without_range_falls_back_to_default()
+  local db = SavedState.Initialize({ minimapAngle = 0 / 0 })
+  Assert.equal(db.minimapAngle, 225)
+end
+
+local function test_infinite_number_falls_back_to_default()
+  local db = SavedState.Initialize({ minimapAngle = 1 / 0, transitionSpeed = -1 / 0 })
+  Assert.equal(db.minimapAngle, 225)
+  Assert.equal(db.transitionSpeed, 40)
+end
+
+local function test_number_without_range_keeps_any_value()
+  local db = SavedState.Initialize({ minimapAngle = 400 })
+  Assert.equal(db.minimapAngle, 400)
+end
+
 local function test_unknown_saved_keys_are_dropped()
   local db = SavedState.Initialize({ removedSetting = true })
   Assert.equal(db.removedSetting, nil)
@@ -56,6 +72,9 @@ return function()
   test_slider_above_range_clamps_to_max()
   test_slider_below_range_clamps_to_min()
   test_nan_slider_falls_back_to_default()
+  test_nan_number_without_range_falls_back_to_default()
+  test_infinite_number_falls_back_to_default()
+  test_number_without_range_keeps_any_value()
   test_unknown_saved_keys_are_dropped()
   test_non_table_saved_gives_defaults()
 end

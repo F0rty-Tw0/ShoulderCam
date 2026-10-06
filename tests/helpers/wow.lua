@@ -91,11 +91,24 @@ local function addFrameMethods(widget)
   function widget:IsEventRegistered(event)
     return self.events[event] == true
   end
+  function widget:ClearAllPoints()
+    self.point = nil
+  end
+  -- Like the client, showing a hidden frame runs its OnShow script and
+  -- hiding a shown frame runs its OnHide script.
   function widget:Show()
+    local wasShown = self.shown
     self.shown = true
+    if not wasShown and self.scripts.OnShow then
+      self.scripts.OnShow(self)
+    end
   end
   function widget:Hide()
+    local wasShown = self.shown
     self.shown = false
+    if wasShown and self.scripts.OnHide then
+      self.scripts.OnHide(self)
+    end
   end
   function widget:IsShown()
     return self.shown
@@ -145,16 +158,44 @@ local function addControlMethods(widget)
   end
 end
 
+-- Strata, level, click/drag registration and textures.
+local function addButtonMethods(widget)
+  function widget:SetFrameStrata(strata)
+    self.strata = strata
+  end
+  function widget:SetFrameLevel(level)
+    self.level = level
+  end
+  function widget:RegisterForClicks(...)
+    self.clicks = { ... }
+  end
+  function widget:RegisterForDrag(...)
+    self.drags = { ... }
+  end
+  function widget:SetTexture(path)
+    self.texture = path
+  end
+  function widget:SetHighlightTexture(path)
+    self.highlightTexture = path
+  end
+end
+
 -- Every stub frame carries every method; tests only call the ones that fit.
 local function newWidget(W, frameType, name, parent)
   local widget = { frameType = frameType, name = name, parent = parent, scripts = {}, events = {}, callbacks = {}, shown = true, enabled = true }
   addFrameMethods(widget)
   addControlMethods(widget)
   addSliderMethods(widget)
+  addButtonMethods(widget)
   function widget:CreateFontString(_name, _layer, font)
     local fontString = newWidget(W, "FontString", nil, self)
     fontString.fontObject = font
     return fontString
+  end
+  function widget:CreateTexture(_name, layer)
+    local texture = newWidget(W, "Texture", nil, self)
+    texture.layer = layer
+    return texture
   end
   if name then
     rawset(_G, name, widget)
@@ -300,6 +341,28 @@ local function installFrames(W)
   end
 end
 
+-- The minimap and the cursor, in screen pixels; tests move W.cursorX/Y.
+local function installMinimap(W)
+  local minimap = newWidget(W, "Frame", "Minimap")
+  minimap.width, minimap.centerX, minimap.centerY, minimap.scale = 140, 500, 400, 1
+  function minimap:GetWidth()
+    return self.width
+  end
+  function minimap:GetCenter()
+    return self.centerX, self.centerY
+  end
+  function minimap:GetEffectiveScale()
+    return self.scale
+  end
+  W.minimap = minimap
+  W.cursorX, W.cursorY = 0, 0
+  rawset(_G, "GetCursorPosition", function()
+    return W.cursorX, W.cursorY
+  end)
+  -- Named frames are rawset into _G: drop the last test's button.
+  rawset(_G, "ShoulderCamMinimapButton", nil)
+end
+
 local function installPlayer(W)
   rawset(_G, "IsMounted", function()
     return W.mounted == true
@@ -378,6 +441,7 @@ function Wow.Install()
   installTimers(W)
   installSettings(W)
   installFrames(W)
+  installMinimap(W)
   installPlayer(W)
   installCamera(W)
   return W

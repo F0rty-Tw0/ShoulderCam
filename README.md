@@ -2,6 +2,11 @@
 
 <p align="center"><b>Over-the-shoulder action camera with separate on foot, combat and mounted setups, and nothing that slows your game down.</b></p>
 
+<p align="center">
+  <img src="screenshots/camera-on-foot.jpg" alt="ShoulderCam camera on foot" width="49%">
+  <img src="screenshots/camera-on-foot-2.jpg" alt="ShoulderCam camera on foot, another angle" width="49%">
+</p>
+
 ## Why players install it
 
 - **The game's own action camera, tamed.** Shoulder offset, enemy and interact focus, dynamic pitch, all from the normal options window.
@@ -18,7 +23,14 @@ Options > AddOns > ShoulderCam, or type `/shouldercam` (or `/shc`). Every change
 - **ShoulderCam** page: turn the addon on or off, zoom speeds, max camera distance, shoulder offset, focus and pitch strength.
 - **Situations** page: On foot, Combat and Mounted side by side. Druid travel forms can count as mounted.
 
+<p align="center">
+  <img src="screenshots/settings-main.png" alt="ShoulderCam settings page" width="49%">
+  <img src="screenshots/settings-situations.png" alt="ShoulderCam Situations page" width="49%">
+</p>
+
 The **Defaults** button on either page resets everything. Key bindings (Options > Keybindings > ShoulderCam): **Toggle ShoulderCam** and **Swap shoulder**. The addon menu button on the minimap (Retail) opens the settings too.
+
+A ShoulderCam button on the minimap edge opens the settings with a left-click and turns the camera on or off with a right-click. Drag it to move it around the minimap. Untick **Show minimap button** on the ShoulderCam page to hide it.
 
 Using ActionCamPlus? Turn it off first: both addons change the same camera settings.
 
