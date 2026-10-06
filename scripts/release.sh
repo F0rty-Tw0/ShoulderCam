@@ -104,7 +104,11 @@ echo "  TBC and Cata: skipped (Classic seasons EOL, no live CDN)"
 # file edit so a missing-notes error leaves the tree untouched.
 python scripts/promote_changelog.py --version "${TAG_VERSION}"
 
-sed -i "s/^## Interface: .*/## Interface: ${TOC_RETAIL}/" ShoulderCam.toc
+# The Forever client ignores the Interface-Forever line and reads only the
+# base line, so Forever's number rides there too (comma list). A failed
+# Forever fetch keeps the number already in the TOC.
+FOREVER_FOR_BASE="${TOC_FOREVER:-$(grep '^## Interface-Forever:' ShoulderCam.toc | grep -o '[0-9][0-9]*' | head -1 || true)}"
+sed -i "s/^## Interface: .*/## Interface: ${TOC_RETAIL}${FOREVER_FOR_BASE:+, ${FOREVER_FOR_BASE}}/" ShoulderCam.toc
 sed -i "s/^## Interface-Mainline: .*/## Interface-Mainline: ${TOC_RETAIL}/" ShoulderCam.toc
 sed -i "s/^## Interface-Vanilla: .*/## Interface-Vanilla: ${TOC_VANILLA}/" ShoulderCam.toc
 sed -i "s/^## Interface-Classic: .*/## Interface-Classic: ${TOC_VANILLA}/" ShoulderCam.toc
