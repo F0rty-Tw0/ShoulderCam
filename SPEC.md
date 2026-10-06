@@ -137,7 +137,7 @@ pays for it. "Show minimap button" shows and hides it live and never re-applies 
 on a circle: on a square minimap the button sits inside the corners.
 
 Account-wide SavedVariables: `ShoulderCamDB`. On load each value is kept only if its type matches the
-default and it is not NaN; slider values are also clamped to their range. Anything else falls back to the default.
+default and, for numbers, it is finite (not NaN or infinite); slider values are also clamped to their range. Anything else falls back to the default.
 
 ### Main page
 
