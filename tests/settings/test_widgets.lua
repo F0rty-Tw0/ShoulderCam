@@ -160,6 +160,7 @@ local function test_slider_value_shows_percent()
 
   Assert.equal(rightLabel(W, STRENGTH, 0.75), "75%")
   Assert.equal(rightLabel(W, STRENGTH, 7 * 0.05), "35%")
+  Assert.equal(rightLabel(W, STRENGTH, 0.7 - 0.05), "65%")
   Assert.equal(rightLabel(W, STRENGTH, 0), "0%")
 end
 
