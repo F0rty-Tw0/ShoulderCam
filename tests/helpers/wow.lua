@@ -82,6 +82,17 @@ local function addFrameMethods(widget)
   function widget:GetScript(script)
     return self.scripts[script]
   end
+  -- Like the client, a hook runs after the handler already set.
+  function widget:HookScript(script, fn)
+    local previous = self.scripts[script]
+    self.scripts[script] = previous and function(...)
+      previous(...)
+      fn(...)
+    end or fn
+  end
+  function widget:SetAllPoints(target)
+    self.allPoints = target
+  end
   function widget:RegisterEvent(event)
     self.events[event] = true
   end
@@ -112,6 +123,13 @@ local function addFrameMethods(widget)
   end
   function widget:IsShown()
     return self.shown
+  end
+  function widget:SetShown(shown)
+    if shown then
+      self:Show()
+    else
+      self:Hide()
+    end
   end
 end
 
@@ -177,6 +195,15 @@ local function addButtonMethods(widget)
   end
   function widget:SetHighlightTexture(path)
     self.highlightTexture = path
+  end
+  function widget:LockHighlight()
+    self.highlightLocked = true
+  end
+  function widget:UnlockHighlight()
+    self.highlightLocked = false
+  end
+  function widget:SetMotionScriptsWhileDisabled(enabled)
+    self.motionWhileDisabled = enabled
   end
 end
 
@@ -309,6 +336,10 @@ local function installFrames(W)
   rawset(_G, "CreateFrame", function(frameType, name, parent, template)
     local widget = newWidget(W, frameType, name, parent)
     widget.template = template
+    -- The slider template's mouse-enabled track is its `Slider` child.
+    if template == "MinimalSliderWithSteppersTemplate" then
+      widget.Slider = newWidget(W, "Slider", nil, widget)
+    end
     return widget
   end)
 
@@ -327,8 +358,9 @@ local function installFrames(W)
     self.owner, self.anchor = owner, anchor
     self.lines = {}
   end
-  function tooltip:AddLine(text)
+  function tooltip:AddLine(text, _r, _g, _b, wrap)
     table.insert(self.lines, text)
+    self.wrap = wrap
   end
 
   -- Calls OnEvent on every frame registered for the event, like the client.

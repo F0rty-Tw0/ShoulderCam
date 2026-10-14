@@ -20,19 +20,20 @@
 
 ## Settings
 
-Options > AddOns > Shoulder Cam, or type `/shouldercam` (or `/shc`). Every change takes effect immediately.
+Options > AddOns > Shoulder Cam, or type `/shouldercam` (or `/shc`). Every change takes effect immediately. Hover any option to see what it does.
 
-- **Shoulder Cam** page: turn the addon on or off, zoom speeds, max camera distance, shoulder offset, focus and pitch strength.
-- **Situations** page: On foot, Combat and Mounted side by side. Druid travel forms can count as mounted.
+- **General** tab: turn the addon on or off, zoom speeds, max camera distance and shoulder offset.
+- **Camera feel** tab: how strongly the camera turns toward your target and tilts.
+- **On foot**, **Combat** and **Mounted** tabs: each situation's own camera. Druid travel forms can count as mounted.
 
 <p align="center">
-  <img src=".github/assets/settings-main.png" alt="Shoulder Cam settings page" width="49%">
-  <img src=".github/assets/settings-situations.png" alt="Shoulder Cam Situations page" width="49%">
+  <img src=".github/assets/settings-main.png" alt="Shoulder Cam General tab" width="49%">
+  <img src=".github/assets/settings-situations.png" alt="Shoulder Cam Combat tab" width="49%">
 </p>
 
-The **Defaults** button on either page resets everything. Key bindings (Options > Keybindings > Shoulder Cam): **Toggle Shoulder Cam** and **Swap shoulder**. The addon menu button on the minimap (Retail) opens the settings too.
+The **Defaults** button resets everything. Key bindings (Options > Keybindings > Shoulder Cam): **Toggle Shoulder Cam** and **Swap shoulder**. The addon menu button on the minimap (Retail) opens the settings too.
 
-A Shoulder Cam button on the minimap edge opens the settings with a left-click and turns the camera on or off with a right-click. Drag it to move it around the minimap. Untick **Show minimap button** on the Shoulder Cam page to hide it.
+A Shoulder Cam button on the minimap edge opens the settings with a left-click and turns the camera on or off with a right-click. Drag it to move it around the minimap. Untick **Show minimap button** on the General tab to hide it.
 
 Using ActionCamPlus? Turn it off first: both addons change the same camera settings.
 
@@ -45,7 +46,7 @@ Retail, Classic Era, TBC, Wrath, Cata, Mists Classic and WoW: Forever. If a game
 - No per-frame updates: zoom uses the game's own camera movement, and the shoulder slide runs on a short timer that stops when it arrives.
 - Mount and combat events are listened to only while that mode is turned on.
 - Switching modes changes only the camera settings that actually differ.
-- The settings pages are built the first time you open them.
+- Each settings tab is built the first time you open it.
 
 ## License
 

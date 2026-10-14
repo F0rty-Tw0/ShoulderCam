@@ -16,13 +16,34 @@ local LABEL_FONT = "GameFontHighlight"
 local DISABLED_FONT = "GameFontDisable"
 -- Shortest round-trip text for a number; "%g" never prints "20.0".
 local NUMBER_FORMAT = "%.14g"
+local PERCENT = 100
+local HINT_ANCHOR = "ANCHOR_RIGHT"
 
 -- One setting row each: a checkbox or a titled slider bound to db[entry.key].
 -- Each returns a wrapper { frame, label, key, :Refresh(db), :SetActive(bool) }
 -- so nothing of ours lands on (or shadows members of) Blizzard's frames.
 -- A widget writes db and calls onChanged(key) only on a player change;
 -- :Refresh(db) re-reads db silently and :SetActive(false) greys it out.
+-- An entry with a `hint` shows its label and hint in GameTooltip on hover.
 local Widgets = {}
+
+-- Label and hint stay in the closures: nothing is stored on `target`.
+local function attachHint(target, entry)
+  if not (target and entry.hint) then
+    return
+  end
+  local title, hint = Localization.Text(entry.label), Localization.Text(entry.hint)
+  target:HookScript("OnEnter", function(self)
+    local tooltip = _G.GameTooltip
+    tooltip:SetOwner(self, HINT_ANCHOR)
+    tooltip:SetText(title)
+    tooltip:AddLine(hint, nil, nil, nil, true)
+    tooltip:Show()
+  end)
+  target:HookScript("OnLeave", function()
+    _G.GameTooltip:Hide()
+  end)
+end
 
 local function addLabel(parent, text, x, y)
   local label = parent:CreateFontString(nil, "ARTWORK", LABEL_FONT)
@@ -52,6 +73,15 @@ local function snap(value, entry, decimals)
   return roundTo(entry.min + math.floor((value - entry.min) / entry.step + 0.5) * entry.step, decimals)
 end
 
+-- Slider value text: "75%" for a 0-1 strength, "39 yd" / "2 s" with a suffix.
+local function formatValue(entry, value, decimals)
+  if entry.percent then
+    return string.format("%d%%", math.floor(value * PERCENT + 0.5))
+  end
+  local number = string.format(NUMBER_FORMAT, roundTo(value, decimals))
+  return entry.suffix and number .. " " .. entry.suffix or number
+end
+
 function Widgets.Checkbox(parent, entry, x, y, db, onChanged)
   local box = _G.CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
   box:SetSize(BOX_SIZE, BOX_SIZE)
@@ -65,6 +95,11 @@ function Widgets.Checkbox(parent, entry, x, y, db, onChanged)
     db[key] = self:GetChecked() and true or false
     onChanged(key)
   end)
+  -- Button API: a greyed-out checkbox still shows its hint on hover.
+  if box.SetMotionScriptsWhileDisabled then
+    box:SetMotionScriptsWhileDisabled(true)
+  end
+  attachHint(box, entry)
   function widget:Refresh(current)
     self.frame:SetChecked(current[key])
   end
@@ -85,9 +120,11 @@ function Widgets.Slider(parent, entry, x, y, db, onChanged)
   local decimals = decimalsOf(entry.step)
   local formatters = {
     [right] = _G.CreateMinimalSliderFormatter(right, function(value)
-      return string.format(NUMBER_FORMAT, roundTo(value, decimals))
+      return formatValue(entry, value, decimals)
     end),
   }
+  -- The template's mouse-enabled track is its `Slider` child.
+  attachHint(slider.Slider, entry)
   slider:Init(db[key], entry.min, entry.max, (entry.max - entry.min) / entry.step, formatters)
   local refreshing = false
   slider:RegisterCallback(mixin.Event.OnValueChanged, function(_owner, value)
