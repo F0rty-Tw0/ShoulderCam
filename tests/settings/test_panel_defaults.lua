@@ -1,5 +1,5 @@
--- Defaults pressed on the Situations page while Combat mode is active and
--- the camera is mid-transition, wired to the real controller.
+-- Defaults pressed on the Combat tab while Combat mode is active and the
+-- camera is mid-transition, wired to the real controller.
 local Assert = require("tests.helpers.assert")
 local Helper = require("tests.helpers.controller")
 local Controller = require("ShoulderCam.Camera.Controller")
@@ -32,12 +32,16 @@ local function test_defaults_mid_combat_transition_resets_once_without_stacked_t
     reports[#reports + 1] = key
     Controller.OnSettingChanged(key)
   end)
-  local situations = W.categories[2].frame
-  W.categories[1].frame.scripts.OnShow(W.categories[1].frame)
-  situations.scripts.OnShow(situations)
+  local canvas = W.categories[1].frame
+  canvas:Show()
+  for _, frame in ipairs(W.frames) do
+    if frame.parent == canvas and frame.text == "Combat" and frame.scripts.OnClick then
+      frame.scripts.OnClick(frame, "LeftButton")
+    end
+  end
   Helper.clearLogs(W)
 
-  situations.OnDefault()
+  canvas.OnDefault()
 
   Assert.equal(#reports, 1)
   Assert.equal(reports[1], "*defaults")
@@ -45,9 +49,9 @@ local function test_defaults_mid_combat_transition_resets_once_without_stacked_t
   Assert.equal(Controller.ActiveMode(), "onFoot")
   Assert.equal(Helper.zoomStarts(W), 1, "one re-apply, one new transition")
   Assert.equal(W.ActiveTimers(), 2, "previous transition replaced, not stacked")
-  Assert.equal(frames.combatEnabled:GetChecked(), false, "situations page refreshed")
-  Assert.equal(frames.distanceCombat:GetValue(), 39, "situations slider refreshed")
-  Assert.equal(frames.distanceCombat:IsEnabled(), false, "combat column greyed again")
+  Assert.equal(frames.combatEnabled:GetChecked(), false, "combat tab refreshed")
+  Assert.equal(frames.distanceCombat:GetValue(), 39, "combat slider refreshed")
+  Assert.equal(frames.distanceCombat:IsEnabled(), false, "combat rows greyed again")
 end
 
 return function()

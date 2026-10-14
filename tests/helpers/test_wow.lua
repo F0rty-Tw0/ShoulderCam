@@ -190,7 +190,91 @@ local function test_player_state_reads_from_w()
   Assert.equal(classFile, "DRUID")
 end
 
+local function test_hook_script_runs_after_existing_handler()
+  Wow.Install()
+  local frame, calls = _G.CreateFrame("Frame"), {}
+  frame:SetScript("OnEnter", function()
+    calls[#calls + 1] = "set"
+  end)
+  frame:HookScript("OnEnter", function()
+    calls[#calls + 1] = "hook"
+  end)
+
+  frame.scripts.OnEnter(frame)
+
+  Assert.equal(table.concat(calls, ","), "set,hook")
+end
+
+local function test_hook_script_without_handler_installs_it()
+  Wow.Install()
+  local frame, got = _G.CreateFrame("Frame"), nil
+  frame:HookScript("OnLeave", function(self)
+    got = self
+  end)
+
+  frame.scripts.OnLeave(frame)
+
+  Assert.equal(got, frame)
+end
+
+local function test_set_shown_false_hides_and_fires_on_hide()
+  Wow.Install()
+  local frame, hidden = _G.CreateFrame("Frame"), false
+  frame:SetScript("OnHide", function()
+    hidden = true
+  end)
+
+  frame:SetShown(false)
+
+  Assert.equal(frame:IsShown(), false)
+  Assert.equal(hidden, true)
+end
+
+local function test_highlight_lock_is_recorded()
+  Wow.Install()
+  local button = _G.CreateFrame("Button")
+
+  button:LockHighlight()
+  Assert.equal(button.highlightLocked, true)
+  button:UnlockHighlight()
+  Assert.equal(button.highlightLocked, false)
+end
+
+local function test_motion_scripts_while_disabled_is_recorded()
+  Wow.Install()
+  local box = _G.CreateFrame("CheckButton")
+
+  box:SetMotionScriptsWhileDisabled(true)
+
+  Assert.equal(box.motionWhileDisabled, true)
+end
+
+local function test_set_all_points_records_target()
+  Wow.Install()
+  local parent = _G.CreateFrame("Frame")
+  local child = _G.CreateFrame("Frame", nil, parent)
+
+  child:SetAllPoints(parent)
+
+  Assert.equal(child.allPoints, parent)
+end
+
+local function test_slider_template_has_inner_slider()
+  Wow.Install()
+  local slider = _G.CreateFrame("Frame", nil, nil, "MinimalSliderWithSteppersTemplate")
+
+  Assert.equal(slider.Slider.frameType, "Slider")
+  Assert.equal(slider.Slider.parent, slider)
+end
+
 return function()
+  test_hook_script_runs_after_existing_handler()
+  test_hook_script_without_handler_installs_it()
+  test_set_shown_false_hides_and_fires_on_hide()
+  test_highlight_lock_is_recorded()
+  test_motion_scripts_while_disabled_is_recorded()
+  test_set_all_points_records_target()
+  test_slider_template_has_inner_slider()
   test_advance_fires_after_timer_once()
   test_cancelled_new_timer_never_fires()
   test_ticker_reschedules_until_cancelled()

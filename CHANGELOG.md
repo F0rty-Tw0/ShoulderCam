@@ -6,6 +6,8 @@ All releases: **0.1.x (current)**
 
 ## [Unreleased]
 
+- Options are now one page with tabs, plain-English names, a description when you hover any option, and units on sliders.
+
 ## [0.1.0] - 2026-10-07
 
 - Over-the-shoulder action camera using the game's built-in action camera, with no "experimental feature" popup.

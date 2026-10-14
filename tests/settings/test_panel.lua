@@ -1,167 +1,136 @@
 local Assert = require("tests.helpers.assert")
 local Wow = require("tests.helpers.wow")
+local P = require("tests.helpers.panel")
 local Defaults = require("ShoulderCam.Settings.Defaults")
 local FlavorCompat = require("ShoulderCam.Core.FlavorCompat")
-local Widgets = require("ShoulderCam.Settings.Widgets")
 
-local PANEL_MODULE = "Settings.Panel"
 local UNAVAILABLE = "Action camera is not available in this game version."
-
--- Fresh fake client and a freshly loaded Panel (it keeps its pages in
--- module state), registered on a default db.
-local function setup(hasActionCam)
-  local W = Wow.Install()
-  FlavorCompat.hasActionCam = hasActionCam ~= false
-  FlavorCompat.hasSettingsApi = true
-  package.loaded[PANEL_MODULE] = nil
-  local Panel = require("ShoulderCam.Settings.Panel")
-  local db = {}
-  Defaults.Reset(db)
-  local changes = {}
-  local category = Panel.Register(db, function(key)
-    changes[#changes + 1] = key
-  end)
-  return { W = W, Panel = Panel, db = db, changes = changes, category = category }
-end
-
-local function show(page)
-  page.scripts.OnShow(page)
-end
-
-local function mainPage(ctx)
-  return ctx.W.categories[1].frame
-end
-
-local function situationsPage(ctx)
-  return ctx.W.categories[2].frame
-end
-
--- Every widget the panel builds, recorded as Widgets returns it.
-local built = {}
-for _, name in ipairs({ "Checkbox", "Slider" }) do
-  local create = Widgets[name]
-  Widgets[name] = function(parent, ...)
-    local widget = create(parent, ...)
-    built[#built + 1] = { parent = parent, widget = widget }
-    return widget
-  end
-end
-
 local CHECKBOX_HEIGHT = 26
 local SLIDER_OFFSET_Y = -16
 
--- key -> Blizzard frame of every setting widget built on `page`.
-local function widgetsOn(_ctx, page)
-  local byKey, count = {}, 0
-  for _, record in ipairs(built) do
-    local key = record.widget.key
-    if record.parent == page then
-      Assert.equal(byKey[key], nil, "duplicate widget for " .. key)
-      byKey[key] = record.widget.frame
-      count = count + 1
-    end
-  end
-  return byKey, count
-end
+local function test_registers_one_category()
+  local ctx = P.setup()
 
--- Keys drawn on a page: entries without a label are stored only.
-local function keysOfPage(pageName)
-  local keys, page = {}, nil
-  for _, entry in ipairs(Defaults.list) do
-    page = entry.page or page
-    if entry.key and entry.label and page == pageName then
-      keys[#keys + 1] = entry.key
-    end
-  end
-  return keys
-end
-
-local function assertListsEveryKey(ctx, page, pageName)
-  local byKey, count = widgetsOn(ctx, page)
-  local keys = keysOfPage(pageName)
-  for _, key in ipairs(keys) do
-    Assert.equal(byKey[key] ~= nil, true, "missing widget for " .. key)
-  end
-  Assert.equal(count, #keys)
-end
-
-local function test_registers_main_category_and_situations_subcategory()
-  local ctx = setup()
-
-  Assert.equal(#ctx.W.categories, 2)
+  Assert.equal(#ctx.W.categories, 1)
   Assert.equal(ctx.category, ctx.W.categories[1])
   Assert.equal(ctx.category.name, "Shoulder Cam")
   Assert.equal(ctx.W.addOnCategories[1], ctx.category)
-  Assert.equal(ctx.W.categories[2].name, "Situations")
-  Assert.equal(ctx.W.categories[2].parent, ctx.category)
 end
 
 local function test_nothing_built_before_first_show()
-  local ctx = setup()
+  local ctx = P.setup()
   local framesAtRegister = #ctx.W.frames
 
   ctx.Panel.Refresh()
 
+  Assert.equal(P.canvas(ctx):IsShown(), false, "canvas starts hidden")
   Assert.equal(#ctx.W.frames, framesAtRegister, "refresh before show builds nothing")
   Assert.equal(#ctx.changes, 0)
-  show(mainPage(ctx))
-  local framesAfterShow = #ctx.W.frames
-  Assert.equal(framesAfterShow > framesAtRegister, true)
-  show(mainPage(ctx))
-  Assert.equal(#ctx.W.frames, framesAfterShow, "built once")
-  Assert.equal(select(2, widgetsOn(ctx, situationsPage(ctx))), 0, "situations waits for its own show")
 end
 
 -- The settings window shows a page with frame:Show(); that must run OnShow
 -- even when the page was never shown before.
-local function test_first_show_by_settings_window_builds_page()
-  local ctx = setup()
+local function test_settings_window_show_builds_tabs_and_general()
+  local ctx = P.setup()
 
-  mainPage(ctx):Show()
-  situationsPage(ctx):Show()
+  P.open(ctx)
 
-  Assert.equal(select(2, widgetsOn(ctx, mainPage(ctx))) > 0, true, "main page built")
-  Assert.equal(select(2, widgetsOn(ctx, situationsPage(ctx))) > 0, true, "situations page built")
+  for _, name in ipairs(P.TAB_NAMES) do
+    Assert.equal(P.tabButton(ctx, name) ~= nil, true, name .. " tab button")
+  end
+  Assert.equal(select(2, P.widgetsOn(P.tabFrame(ctx, "General"))) > 0, true, "General built")
+  Assert.equal(select(2, P.widgetsOn(P.tabFrame(ctx, "Camera feel"))), 0, "Camera feel waits for its click")
 end
 
-local function test_main_page_lists_every_main_key_once()
-  local ctx = setup()
-  show(mainPage(ctx))
-  assertListsEveryKey(ctx, mainPage(ctx), "main")
+local function test_tab_click_builds_rows_once()
+  local ctx = P.setup()
+  P.open(ctx)
+
+  P.clickTab(ctx, "Combat")
+  local _, count = P.widgetsOn(P.tabFrame(ctx, "Combat"))
+  local frames = #ctx.W.frames
+  P.clickTab(ctx, "General")
+  P.clickTab(ctx, "Combat")
+
+  Assert.equal(count > 0, true)
+  Assert.equal(#ctx.W.frames, frames, "nothing rebuilt")
 end
 
-local function test_entry_without_label_draws_no_widget()
-  local ctx = setup()
-  show(mainPage(ctx))
-  Assert.equal(Defaults.byKey.minimapAngle.label, nil, "minimapAngle is stored only")
-  Assert.equal(widgetsOn(ctx, mainPage(ctx)).minimapAngle, nil)
+local function test_tab_click_switches_frame_and_highlight()
+  local ctx = P.setup()
+  P.open(ctx)
+  Assert.equal(P.tabButton(ctx, "General").highlightLocked, true)
+
+  P.clickTab(ctx, "Combat")
+
+  Assert.equal(P.tabFrame(ctx, "Combat"):IsShown(), true)
+  Assert.equal(P.tabFrame(ctx, "General"):IsShown(), false)
+  Assert.equal(P.tabButton(ctx, "Combat").highlightLocked, true)
+  Assert.equal(P.tabButton(ctx, "General").highlightLocked, false)
+end
+
+local function test_reclicking_selected_tab_keeps_it_shown()
+  local ctx = P.setup()
+  P.open(ctx)
+
+  P.clickTab(ctx, "General")
+
+  Assert.equal(P.tabFrame(ctx, "General"):IsShown(), true)
+  Assert.equal(P.tabButton(ctx, "General").highlightLocked, true)
+end
+
+local function test_reshow_keeps_last_tab()
+  local ctx = P.setup()
+  P.open(ctx)
+  P.clickTab(ctx, "Mounted")
+
+  P.canvas(ctx):Hide()
+  P.canvas(ctx):Show()
+
+  Assert.equal(P.tabFrame(ctx, "Mounted"):IsShown(), true)
+  Assert.equal(P.tabFrame(ctx, "General"):IsShown(), false)
+end
+
+local function test_every_drawn_key_on_exactly_one_tab()
+  local ctx = P.setup()
+  P.open(ctx)
+  local drawn = {}
+  for _, name in ipairs(P.TAB_NAMES) do
+    for key in pairs(P.tab(ctx, name)) do
+      Assert.equal(drawn[key], nil, key .. " drawn twice")
+      drawn[key] = name
+    end
+  end
+
+  for key, entry in pairs(Defaults.byKey) do
+    Assert.equal(drawn[key] ~= nil, entry.label ~= nil, key)
+  end
+  Assert.equal(drawn.minimapAngle, nil, "minimapAngle is stored only")
+  Assert.equal(drawn.distanceCombat, "Combat")
 end
 
 local function test_entry_without_label_takes_no_row()
-  local ctx = setup()
-  show(mainPage(ctx))
-  local byKey = widgetsOn(ctx, mainPage(ctx))
-  local rowY = byKey.minimapButton.point[5]
-  Assert.equal(byKey.scrollSpeed.point[5], rowY - CHECKBOX_HEIGHT + SLIDER_OFFSET_Y, "slider right below the checkbox")
+  local ctx = P.setup()
+  P.open(ctx)
+  local general = P.widgetsOn(P.tabFrame(ctx, "General"))
+
+  local rowY = general.minimapButton.frame.point[5]
+  Assert.equal(general.scrollSpeed.frame.point[5], rowY - CHECKBOX_HEIGHT + SLIDER_OFFSET_Y, "slider right below the checkbox")
 end
 
-local function test_situations_page_lists_every_situation_key_in_three_columns()
-  local ctx = setup()
-  show(situationsPage(ctx))
-  assertListsEveryKey(ctx, situationsPage(ctx), "situations")
+local function test_general_columns_sit_side_by_side()
+  local ctx = P.setup()
+  P.open(ctx)
+  local general = P.widgetsOn(P.tabFrame(ctx, "General"))
 
-  local byKey = widgetsOn(ctx, situationsPage(ctx))
-  local onFootX = byKey.offsetOnFoot.point[4]
-  local combatX = byKey.offsetCombat.point[4]
-  local mountedX = byKey.offsetMounted.point[4]
-  Assert.equal(onFootX < combatX and combatX < mountedX, true)
+  Assert.equal(general.offsetAmount.frame.point[4] > general.enabled.frame.point[4], true)
 end
 
 local function test_checkbox_click_writes_db_and_reports_key()
-  local ctx = setup()
-  show(mainPage(ctx))
+  local ctx = P.setup()
+  P.open(ctx)
 
-  widgetsOn(ctx, mainPage(ctx)).leftShoulder:Click()
+  P.widgetsOn(P.tabFrame(ctx, "General")).leftShoulder.frame:Click()
 
   Assert.equal(ctx.db.leftShoulder, true)
   Assert.equal(#ctx.changes, 1)
@@ -169,91 +138,25 @@ local function test_checkbox_click_writes_db_and_reports_key()
 end
 
 local function test_slider_change_writes_db()
-  local ctx = setup()
-  show(mainPage(ctx))
+  local ctx = P.setup()
+  P.open(ctx)
 
-  widgetsOn(ctx, mainPage(ctx)).scrollSpeed:SetValue(25)
+  P.widgetsOn(P.tabFrame(ctx, "General")).scrollSpeed.frame:SetValue(25)
 
   Assert.equal(ctx.db.scrollSpeed, 25)
   Assert.equal(ctx.changes[1], "scrollSpeed")
 end
 
-local function test_combat_column_greys_while_combat_mode_off()
-  local ctx = setup()
-  show(situationsPage(ctx))
-  local byKey = widgetsOn(ctx, situationsPage(ctx))
-  Assert.equal(byKey.offsetCombat:IsEnabled(), false)
-  Assert.equal(byKey.distanceCombat:IsEnabled(), false)
-  Assert.equal(byKey.combatEnabled:IsEnabled(), true, "the toggle itself stays usable")
-  Assert.equal(byKey.offsetOnFoot:IsEnabled(), true)
+local function test_canvas_keeps_settings_window_callbacks()
+  local ctx = P.setup()
 
-  byKey.combatEnabled:Click()
-  Assert.equal(byKey.offsetCombat:IsEnabled(), true)
-  Assert.equal(byKey.distanceCombat:IsEnabled(), true)
-  Assert.equal(byKey.offsetMounted:IsEnabled(), false, "mounted column follows its own toggle")
-
-  byKey.combatEnabled:Click()
-  Assert.equal(byKey.offsetCombat:IsEnabled(), false)
-end
-
-local function test_mounted_column_greys_while_mounted_mode_off()
-  local ctx = setup()
-  show(situationsPage(ctx))
-  local byKey = widgetsOn(ctx, situationsPage(ctx))
-  Assert.equal(byKey.druidForms:IsEnabled(), false)
-  Assert.equal(byKey.mountedEnabled:IsEnabled(), true)
-
-  byKey.mountedEnabled:Click()
-
-  Assert.equal(byKey.druidForms:IsEnabled(), true)
-  Assert.equal(byKey.distanceMounted:IsEnabled(), true)
-end
-
-local function test_refresh_shows_remembered_distance_without_reporting()
-  local ctx = setup()
-  show(situationsPage(ctx))
-  ctx.db.distanceOnFoot = 22.5
-
-  ctx.Panel.Refresh()
-
-  Assert.equal(widgetsOn(ctx, situationsPage(ctx)).distanceOnFoot:GetValue(), 22.5)
-  Assert.equal(ctx.db.distanceOnFoot, 22.5)
-  Assert.equal(#ctx.changes, 0)
-end
-
-local function test_defaults_from_situations_resets_main_key_once()
-  local ctx = setup()
-  show(mainPage(ctx))
-  show(situationsPage(ctx))
-  widgetsOn(ctx, mainPage(ctx)).scrollSpeed:SetValue(10)
-  widgetsOn(ctx, situationsPage(ctx)).combatEnabled:Click()
-  local changesBefore = #ctx.changes
-
-  situationsPage(ctx).OnDefault()
-
-  Assert.equal(#ctx.changes, changesBefore + 1, "one change report")
-  Assert.equal(ctx.changes[#ctx.changes], "*defaults")
-  Assert.equal(ctx.db.scrollSpeed, 20)
-  Assert.equal(ctx.db.combatEnabled, false)
-  Assert.equal(widgetsOn(ctx, mainPage(ctx)).scrollSpeed:GetValue(), 20, "main page refreshed")
-  local situations = widgetsOn(ctx, situationsPage(ctx))
-  Assert.equal(situations.combatEnabled:GetChecked(), false, "situations page refreshed")
-  Assert.equal(situations.offsetCombat:IsEnabled(), false, "combat column greyed again")
-end
-
-local function test_defaults_reports_one_change_even_when_both_pages_reset()
-  local ctx = setup()
-  ctx.db.scrollSpeed = 10
-
-  situationsPage(ctx).OnDefault()
-  mainPage(ctx).OnDefault()
-
-  Assert.equal(#ctx.changes, 1)
-  Assert.equal(ctx.changes[1], "*defaults")
+  Assert.equal(P.canvas(ctx).OnRefresh, ctx.Panel.Refresh)
+  Assert.equal(type(P.canvas(ctx).OnCommit), "function")
+  Assert.equal(type(P.canvas(ctx).OnDefault), "function")
 end
 
 local function test_open_goes_to_main_category()
-  local ctx = setup()
+  local ctx = P.setup()
 
   ctx.Panel.Open()
 
@@ -261,12 +164,11 @@ local function test_open_goes_to_main_category()
 end
 
 local function test_no_action_cam_shows_only_unavailable_line()
-  local ctx = setup(false)
-  Assert.equal(#ctx.W.categories, 1, "no situations page")
+  local ctx = P.setup(false)
+  Assert.equal(#ctx.W.categories, 1)
 
-  show(mainPage(ctx))
+  P.open(ctx)
 
-  Assert.equal(select(2, widgetsOn(ctx, mainPage(ctx))), 0)
   local texts = {}
   for _, frame in ipairs(ctx.W.frames) do
     if frame.frameType == "FontString" then
@@ -275,14 +177,15 @@ local function test_no_action_cam_shows_only_unavailable_line()
   end
   Assert.equal(#texts, 2, "title and the unavailable line")
   Assert.equal(texts[2], UNAVAILABLE)
+  Assert.equal(P.tabButton(ctx, "General"), nil, "no tabs")
   ctx.Panel.Refresh()
-  mainPage(ctx).OnDefault()
+  P.canvas(ctx).OnDefault()
 end
 
 local function test_no_settings_api_registers_nothing()
   Wow.Install()
   FlavorCompat.hasSettingsApi = false
-  package.loaded[PANEL_MODULE] = nil
+  package.loaded["Settings.Panel"] = nil
   local Panel = require("ShoulderCam.Settings.Panel")
 
   local category = Panel.Register({}, function() end)
@@ -293,20 +196,19 @@ local function test_no_settings_api_registers_nothing()
 end
 
 return function()
-  test_registers_main_category_and_situations_subcategory()
+  test_registers_one_category()
   test_nothing_built_before_first_show()
-  test_first_show_by_settings_window_builds_page()
-  test_main_page_lists_every_main_key_once()
-  test_entry_without_label_draws_no_widget()
+  test_settings_window_show_builds_tabs_and_general()
+  test_tab_click_builds_rows_once()
+  test_tab_click_switches_frame_and_highlight()
+  test_reclicking_selected_tab_keeps_it_shown()
+  test_reshow_keeps_last_tab()
+  test_every_drawn_key_on_exactly_one_tab()
   test_entry_without_label_takes_no_row()
-  test_situations_page_lists_every_situation_key_in_three_columns()
+  test_general_columns_sit_side_by_side()
   test_checkbox_click_writes_db_and_reports_key()
   test_slider_change_writes_db()
-  test_combat_column_greys_while_combat_mode_off()
-  test_mounted_column_greys_while_mounted_mode_off()
-  test_refresh_shows_remembered_distance_without_reporting()
-  test_defaults_from_situations_resets_main_key_once()
-  test_defaults_reports_one_change_even_when_both_pages_reset()
+  test_canvas_keeps_settings_window_callbacks()
   test_open_goes_to_main_category()
   test_no_action_cam_shows_only_unavailable_line()
   test_no_settings_api_registers_nothing()
