@@ -2,6 +2,8 @@
 
 <h1 align="center">Shoulder Cam</h1>
 
+[![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](buymeacoffee.com/f0rty_tw0)
+
 <p align="center"><b>Over-the-shoulder action camera with separate on foot, combat and mounted setups, and nothing that slows your game down.</b></p>
 
 <p align="center">
