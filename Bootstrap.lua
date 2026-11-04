@@ -70,6 +70,13 @@ local function toggleEnabled()
   flip("enabled")
 end
 
+local function swapShoulder()
+  flip("leftShoulder")
+end
+
+-- Shared by the slash command and the minimap button.
+local actions = { open = openSettings, toggle = toggleEnabled, swap = swapShoulder }
+
 function Bootstrap.Initialize(saved)
   db = SavedState.Initialize(saved)
   -- Saved before anything else runs: a later Lua error must not leave the
@@ -78,11 +85,11 @@ function Bootstrap.Initialize(saved)
   Controller.Install(db)
   Panel.Register(db, onSettingChanged)
   Controller.onRemembered = Panel.Refresh
-  SlashCommand.Register(openSettings)
+  SlashCommand.Register(actions)
   -- No action camera: the page only says so. No Settings API: no page to
   -- open and no checkbox to hide the button. Either way, no button.
   if FlavorCompat.hasActionCam and FlavorCompat.hasSettingsApi then
-    MinimapButton.Install(db, { open = openSettings, toggle = toggleEnabled })
+    MinimapButton.Install(db, actions)
   end
   return db
 end
@@ -93,9 +100,7 @@ _G.BINDING_NAME_SHOULDERCAM_SWAP = Localization.Text("Swap shoulder")
 
 _G.ShoulderCam_ToggleEnabled = toggleEnabled
 
-function _G.ShoulderCam_SwapShoulder()
-  flip("leftShoulder")
-end
+_G.ShoulderCam_SwapShoulder = swapShoulder
 
 -- AddOn Compartment (Retail): names declared in the TOC.
 _G.ShoulderCam_OnAddonCompartmentClick = openSettings

@@ -149,6 +149,22 @@ local function test_swap_binding_flips_left_shoulder()
   Assert.equal(_G.ShoulderCamDB.leftShoulder, false)
 end
 
+local function test_slash_toggle_turns_camera_off()
+  local W = loaded()
+  W.Fire("PLAYER_ENTERING_WORLD")
+  _G.SlashCmdList.SHOULDERCAM("toggle")
+  Assert.equal(_G.ShoulderCamDB.enabled, false)
+  Assert.equal(W.cvars.test_cameraDynamicPitch, "0")
+end
+
+local function test_slash_swap_flips_left_shoulder()
+  loaded()
+  _G.SlashCmdList.SHOULDERCAM("swap")
+  Assert.equal(_G.ShoulderCamDB.leftShoulder, true)
+  _G.SlashCmdList.SHOULDERCAM("swap")
+  Assert.equal(_G.ShoulderCamDB.leftShoulder, false)
+end
+
 local function test_bindings_before_load_do_nothing()
   local saved = { enabled = true }
   setup(saved)
@@ -268,6 +284,8 @@ return function()
   test_slash_command_opens_main_category()
   test_toggle_binding_flips_enabled_and_turns_camera_off()
   test_swap_binding_flips_left_shoulder()
+  test_slash_toggle_turns_camera_off()
+  test_slash_swap_flips_left_shoulder()
   test_bindings_before_load_do_nothing()
   test_binding_labels_are_set()
   test_compartment_click_opens_main_category()
