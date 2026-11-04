@@ -46,9 +46,8 @@ echo "Releasing ShoulderCam ${TAG_VERSION}..."
 
 # Fetch live TOC interface numbers from Blizzard's patch CDN, one per flavor
 # product. Refuses to release if any required product is unreachable so we
-# never ship a stale interface after a WoW patch. TBC and Cata Classic are
-# EOL — Blizzard no longer publishes a live `wow_tbc` or `wow_classic_cata`
-# product, so those lines are left at whatever the TOC currently has.
+# never ship a stale interface after a WoW patch. Cata Classic is EOL (no
+# live `wow_classic_cata` product), so its line keeps whatever the TOC has.
 fetch_toc() {
   local product="$1"
   python -c "
@@ -79,10 +78,11 @@ echo "Fetching live TOC interface numbers from Blizzard CDN..."
 TOC_RETAIL=$(fetch_toc wow) || cdn_die wow
 TOC_VANILLA=$(fetch_toc wow_classic_era) || cdn_die wow_classic_era
 TOC_MISTS=$(fetch_toc wow_classic) || cdn_die wow_classic
-# WoW: Forever is soft-fail: the beta lives under 'wow_classic_beta' and the
-# launch product key is unknown until 2026-11-04. If the fetch fails, warn and
-# keep whatever the TOC currently has.
-TOC_FOREVER=$(fetch_toc wow_classic_beta) || true
+# Soft-fail products: a failed fetch keeps whatever the TOC currently has.
+# WoW: Forever launched 2026-11-04 as 'wowf' (the beta was 'wow_classic_beta').
+TOC_FOREVER=$(fetch_toc wowf) || true
+# TBC Anniversary realms ('wow_anniversary') are the live TBC client.
+TOC_TBC=$(fetch_toc wow_anniversary) || true
 
 if [[ -z "$TOC_RETAIL" || -z "$TOC_VANILLA" || -z "$TOC_MISTS" ]]; then
   echo "Error: could not parse one or more TOC numbers from Blizzard response."
@@ -98,7 +98,8 @@ if [[ -n "$TOC_FOREVER" ]]; then
 else
   echo "  forever:           skipped (CDN fetch failed, keeping current TOC value)"
 fi
-echo "  TBC and Cata: skipped (Classic seasons EOL, no live CDN)"
+echo "  tbc:               ${TOC_TBC:-skipped (CDN fetch failed, keeping current TOC value)}"
+echo "  Cata: skipped (EOL, no live CDN)"
 
 # Move [Unreleased] notes into this release's section. Runs before any other
 # file edit so a missing-notes error leaves the tree untouched.
@@ -116,6 +117,10 @@ sed -i "s/^## Interface-Mists: .*/## Interface-Mists: ${TOC_MISTS}/" ShoulderCam
 sed -i "s/^## Interface-MoP: .*/## Interface-MoP: ${TOC_MISTS}/" ShoulderCam.toc
 if [[ -n "$TOC_FOREVER" ]]; then
   sed -i "s/^## Interface-Forever: .*/## Interface-Forever: ${TOC_FOREVER}/" ShoulderCam.toc
+fi
+if [[ -n "$TOC_TBC" ]]; then
+  sed -i "s/^## Interface-TBC: .*/## Interface-TBC: ${TOC_TBC}/" ShoulderCam.toc
+  sed -i "s/^## Interface-BCC: .*/## Interface-BCC: ${TOC_TBC}/" ShoulderCam.toc
 fi
 
 # Update version in TOC
