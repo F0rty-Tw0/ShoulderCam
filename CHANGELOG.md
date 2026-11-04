@@ -6,6 +6,8 @@ All releases: **1.0.x (current)** · [0.1.x](archive/changelog/0.1.md)
 
 ## [Unreleased]
 
+- Added `/shc toggle` and `/shc swap` chat commands (usable in macros) that turn the camera on or off and swap the shoulder.
+
 ## [1.0.0] - 2026-10-15
 
 - Options are now one page with tabs, plain-English names, a description when you hover any option, and units on sliders.

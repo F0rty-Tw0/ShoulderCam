@@ -20,7 +20,7 @@
 
 ## Settings
 
-Options > AddOns > Shoulder Cam, or type `/shouldercam` (or `/shc`). Every change takes effect immediately. Hover any option to see what it does.
+Options > AddOns > Shoulder Cam, or type `/shouldercam` (or `/shc`). `/shc toggle` and `/shc swap` turn the camera on or off and swap the shoulder, and work in macros. Every change takes effect immediately. Hover any option to see what it does.
 
 - **General** tab: turn the addon on or off, zoom speeds, max camera distance and shoulder offset.
 - **Camera feel** tab: how strongly the camera turns toward your target and tilts.
@@ -31,7 +31,7 @@ Options > AddOns > Shoulder Cam, or type `/shouldercam` (or `/shc`). Every chang
   <img src=".github/assets/settings-situations.png" alt="Shoulder Cam Combat tab" width="49%">
 </p>
 
-The **Defaults** button resets everything. Key bindings (Options > Keybindings > Shoulder Cam): **Toggle Shoulder Cam** and **Swap shoulder**. The addon menu button on the minimap (Retail) opens the settings too.
+The **Defaults** button resets everything. Key bindings (Options > Keybindings > Shoulder Cam): **Toggle Shoulder Cam** and **Swap shoulder** (same as `/shc toggle` and `/shc swap`). The addon menu button on the minimap (Retail) opens the settings too.
 
 A Shoulder Cam button on the minimap edge opens the settings with a left-click and turns the camera on or off with a right-click. Drag it to move it around the minimap. Untick **Show minimap button** on the General tab to hide it.
 
