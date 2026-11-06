@@ -35,7 +35,14 @@ local GLOBAL_CVARS = {
 }
 
 -- Settings that change which events can switch the mode.
-local EVENT_KEYS = { enabled = true, combatEnabled = true, mountedEnabled = true, druidForms = true, [DEFAULTS_KEY] = true }
+local EVENT_KEYS = {
+  enabled = true,
+  combatEnabled = true,
+  mountedEnabled = true,
+  indoorsEnabled = true,
+  druidForms = true,
+  [DEFAULTS_KEY] = true,
+}
 
 -- Applies the active mode (SPEC.md → Modes, Zoom, Shoulder offset animation)
 -- on mode-changing events and settings changes. `onRemembered(key)` is set by
@@ -46,6 +53,8 @@ local db
 local frame
 local registered = {}
 local activeMode
+-- IsIndoors() at the last apply; lets SPELL_UPDATE_USABLE skip unless it flipped.
+local lastIndoors
 
 local function flag(value)
   return value and 1 or 0
@@ -53,7 +62,7 @@ end
 
 local function updateEvents()
   local isDruid = select(2, _G.UnitClass("player")) == "DRUID"
-  local wanted = Mode.Events(db, isDruid)
+  local wanted = Mode.Events(db, isDruid, _G.IsIndoors ~= nil)
   for event in pairs(registered) do
     if not wanted[event] then
       frame:UnregisterEvent(event)
@@ -119,7 +128,9 @@ function Controller.Apply(reason, key)
   if not FlavorCompat.hasActionCam then
     return
   end
-  local mode = Mode.Resolve(db, Mode.ReadState())
+  local state = Mode.ReadState()
+  lastIndoors = state.indoors
+  local mode = Mode.Resolve(db, state)
   -- An event that keeps the mode (e.g. combat while mounted) has nothing to apply.
   if reason == "event" and mode == activeMode then
     return
@@ -156,6 +167,10 @@ function Controller.ActiveMode()
 end
 
 local function onEvent(_self, event)
+  -- Fires often (cooldowns, resources): one IsIndoors() read, nothing else.
+  if event == "SPELL_UPDATE_USABLE" and (_G.IsIndoors() == true) == lastIndoors then
+    return
+  end
   if event == "PLAYER_ENTERING_WORLD" then
     Controller.Apply("enter_world")
   else
@@ -188,6 +203,7 @@ function Controller.Install(settings)
   end
   db = settings
   activeMode = nil
+  lastIndoors = nil
   registered = {}
   frame = _G.CreateFrame("Frame")
   frame:SetScript("OnEvent", onEvent)

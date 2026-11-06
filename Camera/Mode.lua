@@ -10,8 +10,12 @@ local DRUID_MOUNT_FORMS = Constants.DRUID_MOUNT_FORMS
 -- Picks the active mode (SPEC.md → Modes) and the events that can change it.
 local Mode = {
   -- Per-mode setting keys are "<setting><suffix>", e.g. offsetCombat.
-  SUFFIX = { onFoot = "OnFoot", combat = "Combat", mounted = "Mounted" },
+  SUFFIX = { onFoot = "OnFoot", indoors = "Indoors", combat = "Combat", mounted = "Mounted" },
 }
+
+-- IsIndoors() has no single change event; these are the ones that fire
+-- around a doorway (same set DynamicCam uses).
+local INDOOR_EVENTS = { "ZONE_CHANGED_INDOORS", "ZONE_CHANGED", "ZONE_CHANGED_NEW_AREA", "SPELL_UPDATE_USABLE" }
 
 local function countsAsMounted(db, state)
   if state.mounted then
@@ -27,6 +31,9 @@ function Mode.Resolve(db, state)
   if db.mountedEnabled and countsAsMounted(db, state) then
     return "mounted"
   end
+  if db.indoorsEnabled and state.indoors then
+    return "indoors"
+  end
   if db.combatEnabled and state.combat then
     return "combat"
   end
@@ -38,10 +45,11 @@ function Mode.ReadState()
     mounted = _G.IsMounted() == true,
     combat = _G.UnitAffectingCombat("player") == true,
     formId = _G.GetShapeshiftFormID(),
+    indoors = _G.IsIndoors ~= nil and _G.IsIndoors() == true,
   }
 end
 
-function Mode.Events(db, isDruid)
+function Mode.Events(db, isDruid, canDetectIndoors)
   local events = { PLAYER_ENTERING_WORLD = true }
   if not db.enabled then
     return events
@@ -55,6 +63,11 @@ function Mode.Events(db, isDruid)
   if db.combatEnabled then
     events.PLAYER_REGEN_DISABLED = true
     events.PLAYER_REGEN_ENABLED = true
+  end
+  if db.indoorsEnabled and canDetectIndoors then
+    for _, event in ipairs(INDOOR_EVENTS) do
+      events[event] = true
+    end
   end
   return events
 end

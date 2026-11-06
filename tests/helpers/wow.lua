@@ -405,6 +405,9 @@ local function installPlayer(W)
   rawset(_G, "GetShapeshiftFormID", function()
     return W.formId
   end)
+  rawset(_G, "IsIndoors", function()
+    return W.indoors == true
+  end)
   rawset(_G, "UnitClass", function(_unit)
     return W.class, W.class, CLASS_IDS[W.class]
   end)

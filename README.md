@@ -14,7 +14,7 @@
 ## Why players install it
 
 - **The game's own action camera, tamed.** Shoulder offset, enemy and interact focus, dynamic pitch, all from the normal options window.
-- **A camera for every situation.** On foot, Combat and Mounted each get their own shoulder offset, focus, pitch and zoom distance. The camera switches by itself when you mount up or enter combat.
+- **A camera for every situation.** On foot, Indoors, Combat and Mounted each get their own shoulder offset, focus, pitch and zoom distance. The camera switches by itself when you mount up, enter combat or step inside a building or cave.
 - **Smooth moves.** The camera glides to each mode's zoom distance and slides over to the shoulder instead of snapping.
 - **Remembers your zoom.** Scroll to a distance you like and that mode keeps it.
 - **No nag popup.** The "experimental feature" warning stays away.
@@ -26,7 +26,7 @@ Options > AddOns > Shoulder Cam, or type `/shouldercam` (or `/shc`). `/shc toggl
 
 - **General** tab: turn the addon on or off, zoom speeds, max camera distance and shoulder offset.
 - **Camera feel** tab: how strongly the camera turns toward your target and tilts.
-- **On foot**, **Combat** and **Mounted** tabs: each situation's own camera. Druid travel forms can count as mounted.
+- **On foot**, **Indoors**, **Combat** and **Mounted** tabs: each situation's own camera. The Indoors camera (off by default) keeps the camera close inside buildings and caves. Druid travel forms can count as mounted.
 
 <p align="center">
   <img src=".github/assets/settings-main.png" alt="Shoulder Cam General tab" width="49%">

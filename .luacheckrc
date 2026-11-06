@@ -81,6 +81,7 @@ read_globals = {
   "IsMounted",
   "UnitAffectingCombat",
   "GetShapeshiftFormID",
+  "IsIndoors",
   "UnitClass",
 
   -- WoW: Forever global that throws for unknown modules

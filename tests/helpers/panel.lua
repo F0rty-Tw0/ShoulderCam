@@ -10,7 +10,7 @@ local PANEL_MODULE = "Settings.Panel"
 
 local P = {}
 
-P.TAB_NAMES = { "General", "Camera feel", "On foot", "Combat", "Mounted" }
+P.TAB_NAMES = { "General", "Camera feel", "On foot", "Indoors", "Combat", "Mounted" }
 
 -- Every widget the panel builds, recorded as Widgets returns it.
 local built = {}

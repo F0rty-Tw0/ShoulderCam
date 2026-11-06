@@ -74,6 +74,70 @@ local function test_read_state_reflects_player()
   Assert.equal(state.formId, 27)
 end
 
+local function test_indoors_mode_when_enabled_and_indoors()
+  local db = newDb({ indoorsEnabled = true })
+
+  Assert.equal(Mode.Resolve(db, { indoors = true }), "indoors")
+end
+
+local function test_indoors_beats_combat()
+  local db = newDb({ indoorsEnabled = true, combatEnabled = true })
+
+  Assert.equal(Mode.Resolve(db, { indoors = true, combat = true }), "indoors")
+end
+
+local function test_mounted_beats_indoors()
+  local db = newDb({ indoorsEnabled = true, mountedEnabled = true })
+
+  Assert.equal(Mode.Resolve(db, { indoors = true, mounted = true }), "mounted")
+end
+
+local function test_indoors_off_falls_through_to_combat()
+  local db = newDb({ indoorsEnabled = false, combatEnabled = true })
+
+  Assert.equal(Mode.Resolve(db, { indoors = true, combat = true }), "combat")
+end
+
+local function test_outdoors_with_indoors_on_is_on_foot()
+  local db = newDb({ indoorsEnabled = true })
+
+  Assert.equal(Mode.Resolve(db, { indoors = false }), "onFoot")
+end
+
+local function test_read_state_reads_indoors()
+  local W = Wow.Install()
+  W.indoors = true
+
+  Assert.equal(Mode.ReadState().indoors, true)
+end
+
+local function test_read_state_without_is_indoors_api()
+  Wow.Install()
+  _G.IsIndoors = nil
+
+  Assert.equal(Mode.ReadState().indoors, false)
+end
+
+local INDOOR_EVENT_LIST = "PLAYER_ENTERING_WORLD,SPELL_UPDATE_USABLE,ZONE_CHANGED,ZONE_CHANGED_INDOORS,ZONE_CHANGED_NEW_AREA"
+
+local function test_indoor_events_when_enabled_and_detectable()
+  local db = newDb({ indoorsEnabled = true })
+
+  Assert.equal(eventList(Mode.Events(db, false, true)), INDOOR_EVENT_LIST)
+end
+
+local function test_no_indoor_events_without_api()
+  local db = newDb({ indoorsEnabled = true })
+
+  Assert.equal(eventList(Mode.Events(db, false, false)), "PLAYER_ENTERING_WORLD")
+end
+
+local function test_no_indoor_events_when_disabled()
+  local db = newDb({ enabled = false, indoorsEnabled = true })
+
+  Assert.equal(eventList(Mode.Events(db, false, true)), "PLAYER_ENTERING_WORLD")
+end
+
 local function test_default_events_only_entering_world()
   Assert.equal(eventList(Mode.Events(newDb(), true)), "PLAYER_ENTERING_WORLD")
 end
@@ -112,6 +176,7 @@ local function test_suffix_builds_per_mode_keys()
   Assert.equal("offset" .. Mode.SUFFIX.onFoot, "offsetOnFoot")
   Assert.equal("offset" .. Mode.SUFFIX.combat, "offsetCombat")
   Assert.equal("offset" .. Mode.SUFFIX.mounted, "offsetMounted")
+  Assert.equal("offset" .. Mode.SUFFIX.indoors, "offsetIndoors")
 end
 
 return function()
@@ -123,6 +188,16 @@ return function()
   test_cat_form_is_on_foot()
   test_combat_without_combat_mode_is_on_foot()
   test_read_state_reflects_player()
+  test_indoors_mode_when_enabled_and_indoors()
+  test_indoors_beats_combat()
+  test_mounted_beats_indoors()
+  test_indoors_off_falls_through_to_combat()
+  test_outdoors_with_indoors_on_is_on_foot()
+  test_read_state_reads_indoors()
+  test_read_state_without_is_indoors_api()
+  test_indoor_events_when_enabled_and_detectable()
+  test_no_indoor_events_without_api()
+  test_no_indoor_events_when_disabled()
   test_default_events_only_entering_world()
   test_mounted_events_for_non_druid()
   test_mounted_events_for_druid_add_shapeshift()
