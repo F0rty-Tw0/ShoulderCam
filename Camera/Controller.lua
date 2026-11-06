@@ -140,7 +140,7 @@ function Controller.Apply(reason, key)
     ZoomMemory.Cancel()
   end
   activeMode = mode
-  if mode == "off" then
+  if mode == "off" or mode == "paused" then
     applyOff()
     return
   end

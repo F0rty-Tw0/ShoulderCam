@@ -408,6 +408,12 @@ local function installPlayer(W)
   rawset(_G, "IsIndoors", function()
     return W.indoors == true
   end)
+  rawset(_G, "UnitOnTaxi", function(unit)
+    return unit == "player" and W.onTaxi == true
+  end)
+  rawset(_G, "UnitInVehicle", function(unit)
+    return unit == "player" and W.inVehicle == true
+  end)
   rawset(_G, "UnitClass", function(_unit)
     return W.class, W.class, CLASS_IDS[W.class]
   end)

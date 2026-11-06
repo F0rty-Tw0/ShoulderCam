@@ -82,6 +82,8 @@ read_globals = {
   "UnitAffectingCombat",
   "GetShapeshiftFormID",
   "IsIndoors",
+  "UnitOnTaxi",
+  "UnitInVehicle",
   "UnitClass",
 
   -- WoW: Forever global that throws for unknown modules
