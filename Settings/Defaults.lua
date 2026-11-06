@@ -166,7 +166,7 @@ local MODE_TABS = {
   },
   {
     tab = "Indoors",
-    intro = "Camera used inside buildings and caves. Takes over from the Combat camera.",
+    intro = "Camera used inside buildings and caves, in combat too.",
     mode = "indoors",
     suffix = "Indoors",
     defaults = { pitch = true, distance = 15 },
