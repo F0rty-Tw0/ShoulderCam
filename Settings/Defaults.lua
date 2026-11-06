@@ -118,6 +118,17 @@ local Defaults = {
       step = 0.05,
       percent = true,
     },
+    { header = "Head movement" },
+    {
+      key = "headMovement",
+      default = 0,
+      label = "Follow head movement",
+      hint = "How much the camera follows your character's head as it moves.",
+      min = 0,
+      max = 1,
+      step = 0.05,
+      percent = true,
+    },
     { column = 2 },
     { header = "Camera tilt" },
     {
