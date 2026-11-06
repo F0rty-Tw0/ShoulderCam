@@ -20,6 +20,7 @@ local ZOOM_FACTOR_YARDS = Constants.ZOOM_FACTOR_YARDS
 local ENEMY_CVAR = "test_cameraTargetFocusEnemyEnable"
 local INTERACT_CVAR = "test_cameraTargetFocusInteractEnable"
 local PITCH_CVAR = "test_cameraDynamicPitch"
+local HEAD_MOVEMENT_CVAR = "test_cameraHeadMovementStrength"
 local ZOOM_SPEED_CVAR = "cameraZoomSpeed"
 local DEFAULTS_KEY = "*defaults"
 
@@ -29,6 +30,7 @@ local GLOBAL_CVARS = {
   { "test_cameraTargetFocusInteractStrengthYaw", "focusYaw" },
   { "test_cameraTargetFocusEnemyStrengthPitch", "focusPitch" },
   { "test_cameraTargetFocusInteractStrengthPitch", "focusPitch" },
+  { HEAD_MOVEMENT_CVAR, "headMovement" },
   { "test_cameraDynamicPitchBaseFovPad", "pitchStrength" },
   { "test_cameraDynamicPitchBaseFovPadDownScale", "pitchDown" },
   { "test_cameraDynamicPitchBaseFovPadFlying", "pitchFlying" },
@@ -84,6 +86,7 @@ local function applyOff()
   CVar.Set(ENEMY_CVAR, 0)
   CVar.Set(INTERACT_CVAR, 0)
   CVar.Set(PITCH_CVAR, 0)
+  CVar.Set(HEAD_MOVEMENT_CVAR, 0)
 end
 
 local function applyGlobals()

@@ -16,6 +16,7 @@ Wow.CVAR_SEEDS = {
   test_cameraTargetFocusEnemyStrengthPitch = "0.4",
   test_cameraTargetFocusInteractStrengthYaw = "1",
   test_cameraTargetFocusInteractStrengthPitch = "0.75",
+  test_cameraHeadMovementStrength = "0",
   test_cameraDynamicPitchBaseFovPad = "0.4",
   test_cameraDynamicPitchBaseFovPadDownScale = "0.25",
   test_cameraDynamicPitchBaseFovPadFlying = "0.75",
