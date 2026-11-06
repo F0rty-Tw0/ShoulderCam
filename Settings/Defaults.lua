@@ -30,7 +30,7 @@ local Defaults = {
       key = "minimapButton",
       default = true,
       label = "Show minimap button",
-      hint = "Left-click opens these options, right-click turns the camera on or off.",
+      hint = "Left-click: options. Right-click: camera on/off. Middle-click: swap shoulder.",
     },
     -- Degrees around the minimap, 0 = east, counter-clockwise; set by dragging.
     { key = "minimapAngle", default = 225 },

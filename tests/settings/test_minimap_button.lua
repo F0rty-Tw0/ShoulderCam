@@ -18,13 +18,16 @@ local function setup(db)
   for key, value in pairs(db or {}) do
     settings[key] = value
   end
-  local calls = { open = 0, toggle = 0 }
+  local calls = { open = 0, toggle = 0, swap = 0 }
   local actions = {
     open = function()
       calls.open = calls.open + 1
     end,
     toggle = function()
       calls.toggle = calls.toggle + 1
+    end,
+    swap = function()
+      calls.swap = calls.swap + 1
     end,
   }
   return { W = W, MinimapButton = MinimapButton, db = settings, calls = calls, actions = actions }
@@ -98,6 +101,22 @@ local function test_left_click_opens_and_right_click_toggles()
   Assert.equal(ctx.calls.toggle, 1)
 end
 
+local function test_middle_click_swaps_the_shoulder_only()
+  local ctx = installed()
+
+  button().scripts.OnClick(button(), "MiddleButton")
+
+  Assert.equal(ctx.calls.swap, 1)
+  Assert.equal(ctx.calls.toggle, 0)
+  Assert.equal(ctx.calls.open, 0)
+end
+
+local function test_button_listens_for_left_right_and_middle_clicks()
+  installed()
+
+  Assert.equal(table.concat(button().clicks, ","), "LeftButtonUp,RightButtonUp,MiddleButtonUp")
+end
+
 local function test_drag_saves_cursor_angle_while_held_then_stops_ticking()
   local ctx = installed()
   ctx.W.minimap.scale = 2
@@ -143,6 +162,7 @@ local function test_hover_shows_tooltip_and_leave_hides_it()
   Assert.equal(tooltip.text, "Shoulder Cam")
   Assert.equal(tooltip.lines[1], "Left-click: settings")
   Assert.equal(tooltip.lines[2], "Right-click: toggle on/off")
+  Assert.equal(tooltip.lines[3], "Middle-click: swap shoulder")
   Assert.equal(tooltip:IsShown(), true)
 
   button().scripts.OnLeave(button())
@@ -172,6 +192,8 @@ return function()
   test_not_created_when_hidden_at_install()
   test_refresh_follows_the_setting()
   test_left_click_opens_and_right_click_toggles()
+  test_middle_click_swaps_the_shoulder_only()
+  test_button_listens_for_left_right_and_middle_clicks()
   test_drag_saves_cursor_angle_while_held_then_stops_ticking()
   test_hiding_mid_drag_cancels_ticker()
   test_no_minimap_installs_nothing()
