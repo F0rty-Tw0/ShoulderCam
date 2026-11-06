@@ -42,6 +42,14 @@ local SPEC = {
   { "distanceOnFoot", 39, 1, 39, 0.5 },
   { "distanceCombat", 39, 1, 39, 0.5 },
   { "distanceMounted", 36.5, 1, 39, 0.5 },
+  { "indoorsEnabled", false },
+  { "offsetIndoors", false },
+  { "focusEnemyIndoors", false },
+  { "focusInteractIndoors", false },
+  { "pitchIndoors", true },
+  { "zoomIndoors", true },
+  { "rememberIndoors", true },
+  { "distanceIndoors", 15, 1, 39, 0.5 },
 }
 
 local function test_every_default_and_range_matches_spec()
@@ -93,7 +101,7 @@ local function entriesByTab()
 end
 
 local function test_mode_tab_rows_carry_mode()
-  local modeOf = { ["On foot"] = "onFoot", Combat = "combat", Mounted = "mounted" }
+  local modeOf = { ["On foot"] = "onFoot", Indoors = "indoors", Combat = "combat", Mounted = "mounted" }
   for _, row in ipairs(entriesByTab()) do
     local mode = modeOf[row.tab]
     if row.entry.key then
@@ -112,7 +120,28 @@ local function test_tabs_in_order()
       Assert.equal(type(entry.intro) == "string" and #entry.intro > 0, true, entry.tab .. " intro")
     end
   end
-  Assert.equal(table.concat(names, ","), "General,Camera feel,On foot,Combat,Mounted")
+  Assert.equal(table.concat(names, ","), "General,Camera feel,On foot,Indoors,Combat,Mounted")
+end
+
+local function introOf(tabName)
+  for _, entry in ipairs(Defaults.list) do
+    if entry.tab == tabName then
+      return entry.intro
+    end
+  end
+end
+
+local function test_indoors_switch_and_intros_text()
+  local switch = Defaults.byKey.indoorsEnabled
+  Assert.equal(switch.label, "Use an indoor camera")
+  Assert.equal(switch.hint, "Switches to the settings below while you are inside a building or cave.")
+  Assert.equal(introOf("On foot"), "Camera used unless the Indoors, Combat or Mounted camera is turned on and takes over.")
+  Assert.equal(introOf("Indoors"), "Camera used inside buildings and caves. Takes over from the Combat camera.")
+  Assert.equal(introOf("Combat"), "Camera used in combat. When off, combat uses the Indoors or On foot camera.")
+  Assert.equal(
+    introOf("Mounted"),
+    "Camera used while mounted. When off, mounted uses the Indoors, Combat or On foot camera."
+  )
 end
 
 local MAX_HINT = 90
@@ -148,6 +177,7 @@ local function test_units_per_spec()
     distanceOnFoot = "yd",
     distanceCombat = "yd",
     distanceMounted = "yd",
+    distanceIndoors = "yd",
     offsetTime = "s",
     focusYaw = "%",
     focusPitch = "%",
@@ -166,6 +196,8 @@ local function test_only_mode_switches_are_mode_toggles()
   Assert.equal(Defaults.byKey.combatEnabled.modeToggle, true)
   Assert.equal(Defaults.byKey.mountedEnabled.mode, "mounted")
   Assert.equal(Defaults.byKey.mountedEnabled.modeToggle, true)
+  Assert.equal(Defaults.byKey.indoorsEnabled.mode, "indoors")
+  Assert.equal(Defaults.byKey.indoorsEnabled.modeToggle, true)
   Assert.equal(Defaults.byKey.druidForms.modeToggle, nil)
 end
 
@@ -186,6 +218,7 @@ return function()
   test_mode_tab_rows_carry_mode()
   test_only_mode_switches_are_mode_toggles()
   test_tabs_in_order()
+  test_indoors_switch_and_intros_text()
   test_every_drawn_entry_has_short_hint()
   test_parents_are_earlier_plain_checkboxes_on_same_tab()
   test_units_per_spec()

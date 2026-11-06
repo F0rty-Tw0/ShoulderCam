@@ -159,14 +159,26 @@ local Defaults = {
 local MODE_TABS = {
   {
     tab = "On foot",
-    intro = "Camera used unless the Combat or Mounted camera is turned on and takes over.",
+    intro = "Camera used unless the Indoors, Combat or Mounted camera is turned on and takes over.",
     mode = "onFoot",
     suffix = "OnFoot",
     defaults = { pitch = true, distance = 39 },
   },
   {
+    tab = "Indoors",
+    intro = "Camera used inside buildings and caves. Takes over from the Combat camera.",
+    mode = "indoors",
+    suffix = "Indoors",
+    defaults = { pitch = true, distance = 15 },
+    switch = {
+      key = "indoorsEnabled",
+      label = "Use an indoor camera",
+      hint = "Switches to the settings below while you are inside a building or cave.",
+    },
+  },
+  {
     tab = "Combat",
-    intro = "Camera used in combat. When off, combat uses the On foot camera.",
+    intro = "Camera used in combat. When off, combat uses the Indoors or On foot camera.",
     mode = "combat",
     suffix = "Combat",
     defaults = { pitch = true, distance = 39 },
@@ -178,7 +190,7 @@ local MODE_TABS = {
   },
   {
     tab = "Mounted",
-    intro = "Camera used while mounted. When off, mounted uses the Combat or On foot camera.",
+    intro = "Camera used while mounted. When off, mounted uses the Indoors, Combat or On foot camera.",
     mode = "mounted",
     suffix = "Mounted",
     defaults = { pitch = false, distance = 36.5 },
