@@ -4,7 +4,7 @@ if type(ns) ~= "table" then
 end
 
 local Constants = {
-  VERSION = "v1.1.0",
+  VERSION = "v1.2.0",
   -- Name players see; the folder, saved variables and slash commands keep "ShoulderCam".
   DISPLAY_NAME = "Shoulder Cam",
 
