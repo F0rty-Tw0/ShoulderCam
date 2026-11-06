@@ -18,9 +18,14 @@ local POPUP_DIALOG = "EXPERIMENTAL_CVAR_WARNING"
 local MINIMAP_KEY = "minimapButton"
 -- What Panel reports after its Defaults button reset every setting.
 local DEFAULTS_KEY = "*defaults"
+local MESSAGE_ON = "Shoulder Cam: on"
+local MESSAGE_OFF = "Shoulder Cam: off"
+local MESSAGE_LEFT = "Shoulder Cam: left shoulder"
+local MESSAGE_RIGHT = "Shoulder Cam: right shoulder"
 
 -- Addon entry point: popup suppression, init on ADDON_LOADED, key binding
--- AddOn Compartment globals and the minimap button (SPEC.md → Settings).
+-- AddOn Compartment globals, the minimap button and the slash command's chat
+-- confirmations (SPEC.md → Settings).
 local Bootstrap = {}
 
 local db
@@ -74,8 +79,25 @@ local function swapShoulder()
   flip("leftShoulder")
 end
 
--- Shared by the slash command and the minimap button.
+-- The silent set: the minimap button uses it as is.
 local actions = { open = openSettings, toggle = toggleEnabled, swap = swapShoulder }
+
+-- Only the slash command speaks (it is registered after `db` is set).
+local function say(message)
+  _G.print(Localization.Text(message))
+end
+
+local function toggleAndSay()
+  toggleEnabled()
+  say(db.enabled and MESSAGE_ON or MESSAGE_OFF)
+end
+
+local function swapAndSay()
+  swapShoulder()
+  say(db.leftShoulder and MESSAGE_LEFT or MESSAGE_RIGHT)
+end
+
+local slashActions = { open = openSettings, toggle = toggleAndSay, swap = swapAndSay }
 
 function Bootstrap.Initialize(saved)
   db = SavedState.Initialize(saved)
@@ -85,7 +107,7 @@ function Bootstrap.Initialize(saved)
   Controller.Install(db)
   Panel.Register(db, onSettingChanged)
   Controller.onRemembered = Panel.Refresh
-  SlashCommand.Register(actions)
+  SlashCommand.Register(slashActions)
   -- No action camera: the page only says so. No Settings API: no page to
   -- open and no checkbox to hide the button. Either way, no button.
   if FlavorCompat.hasActionCam and FlavorCompat.hasSettingsApi then
