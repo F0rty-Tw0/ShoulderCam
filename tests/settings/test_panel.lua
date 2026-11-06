@@ -42,6 +42,15 @@ local function test_settings_window_show_builds_tabs_and_general()
   Assert.equal(select(2, P.widgetsOn(P.tabFrame(ctx, "Camera feel"))), 0, "Camera feel waits for its click")
 end
 
+-- Six tabs must fit in the row five 100 px tabs used: LEFT 16 + 5 * (82 + 4).
+local function test_six_tab_buttons_fit_in_row()
+  local ctx = P.setup()
+  P.open(ctx)
+
+  Assert.equal(P.tabButton(ctx, "Mounted").width, 82)
+  Assert.equal(P.tabButton(ctx, "Mounted").point[4], 446)
+end
+
 local function test_tab_click_builds_rows_once()
   local ctx = P.setup()
   P.open(ctx)
@@ -199,6 +208,7 @@ return function()
   test_registers_one_category()
   test_nothing_built_before_first_show()
   test_settings_window_show_builds_tabs_and_general()
+  test_six_tab_buttons_fit_in_row()
   test_tab_click_builds_rows_once()
   test_tab_click_switches_frame_and_highlight()
   test_reclicking_selected_tab_keeps_it_shown()
