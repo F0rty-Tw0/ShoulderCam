@@ -96,7 +96,10 @@ if [[ -n "$STYLUA_CMD" ]]; then
     fi
   fi
 else
-  echo "WARN: stylua not found (run 'powershell -ExecutionPolicy Bypass -File scripts/setup-lint-tools.ps1' or install globally)"
+  # CI checks formatting with StyLua: skipping it here lets a format break
+  # pass locally and fail only in CI.
+  echo "ERROR: stylua not found (run 'powershell -ExecutionPolicy Bypass -File scripts/setup-lint-tools.ps1' or install globally)"
+  EXIT_CODE=1
 fi
 
 echo ""
