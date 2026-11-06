@@ -190,6 +190,15 @@ local function test_player_state_reads_from_w()
   Assert.equal(classFile, "DRUID")
 end
 
+local function test_is_indoors_follows_w_indoors()
+  local W = Wow.Install()
+  Assert.equal(_G.IsIndoors(), false)
+
+  W.indoors = true
+
+  Assert.equal(_G.IsIndoors(), true)
+end
+
 local function test_hook_script_runs_after_existing_handler()
   Wow.Install()
   local frame, calls = _G.CreateFrame("Frame"), {}
@@ -288,4 +297,5 @@ return function()
   test_check_button_click_runs_on_click()
   test_slider_set_value_fires_value_changed()
   test_player_state_reads_from_w()
+  test_is_indoors_follows_w_indoors()
 end
