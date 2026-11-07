@@ -96,7 +96,7 @@ local Defaults = {
       hint = "Slides onto the shoulder in step with an auto-zoom, not on its own timer.",
     },
 
-    { tab = "Camera feel", intro = "Strengths used by every situation that turns focus or tilt on." },
+    { tab = "Camera feel", intro = "Head movement, plus focus and tilt strengths for situations that turn them on." },
     { header = "Target focus" },
     {
       key = "focusYaw",

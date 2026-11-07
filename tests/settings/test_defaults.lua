@@ -140,6 +140,7 @@ local function test_indoors_switch_and_intros_text()
   Assert.equal(introOf("Indoors"), "Camera used inside buildings and caves, in combat too.")
   Assert.equal(introOf("Combat"), "Camera used in combat. When off, combat uses the Indoors or On foot camera.")
   Assert.equal(introOf("Mounted"), "Camera used while mounted. When off, mounted uses the Indoors, Combat or On foot camera.")
+  Assert.equal(introOf("Camera feel"), "Head movement, plus focus and tilt strengths for situations that turn them on.")
 end
 
 local MAX_HINT = 90
