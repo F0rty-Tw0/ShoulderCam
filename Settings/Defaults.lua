@@ -96,7 +96,7 @@ local Defaults = {
       hint = "Slides onto the shoulder in step with an auto-zoom, not on its own timer.",
     },
 
-    { tab = "Camera feel", intro = "Strengths used by every situation that turns focus or tilt on." },
+    { tab = "Camera feel", intro = "Head movement, plus focus and tilt strengths for situations that turn them on." },
     { header = "Target focus" },
     {
       key = "focusYaw",
@@ -113,6 +113,17 @@ local Defaults = {
       default = 0.75,
       label = "Vertical focus",
       hint = "How strongly the camera tilts up or down toward your target.",
+      min = 0,
+      max = 1,
+      step = 0.05,
+      percent = true,
+    },
+    { header = "Head movement" },
+    {
+      key = "headMovement",
+      default = 0,
+      label = "Follow head movement",
+      hint = "How much the camera follows your character's head as it moves.",
       min = 0,
       max = 1,
       step = 0.05,

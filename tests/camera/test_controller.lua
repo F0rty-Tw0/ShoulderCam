@@ -97,6 +97,21 @@ local function test_off_resets_cvars_and_cancels_timers()
   Assert.equal(W.log[#W.log].name, "MoveViewOutStop")
 end
 
+local function test_head_movement_follows_slider_and_off_zeroes_it()
+  local W, db = Helper.setup({ headMovement = 0.5 })
+
+  W.Fire("PLAYER_ENTERING_WORLD")
+  Assert.equal(W.cvars.test_cameraHeadMovementStrength, "0.5")
+
+  db.enabled = false
+  Controller.OnSettingChanged("enabled")
+  Assert.equal(W.cvars.test_cameraHeadMovementStrength, "0")
+
+  db.enabled = true
+  Controller.OnSettingChanged("enabled")
+  Assert.equal(W.cvars.test_cameraHeadMovementStrength, "0.5")
+end
+
 local function test_no_action_cam_writes_nothing()
   local W, db = Helper.setup()
   W.cvars.test_cameraDynamicPitch = nil
@@ -182,6 +197,7 @@ return function()
   test_install_only_writes_scroll_speed()
   test_scroll_speed_change_writes_zoom_speed()
   test_off_resets_cvars_and_cancels_timers()
+  test_head_movement_follows_slider_and_off_zeroes_it()
   test_no_action_cam_writes_nothing()
   test_mounted_toggle_registers_mount_event()
   test_druid_forms_toggle_registers_shapeshift_event()

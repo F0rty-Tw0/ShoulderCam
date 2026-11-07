@@ -15,6 +15,7 @@ local SPEC = {
   { "syncOffset", true },
   { "focusYaw", 1, 0, 1, 0.05 },
   { "focusPitch", 0.75, 0, 1, 0.05 },
+  { "headMovement", 0, 0, 1, 0.05 },
   { "pitchStrength", 0.4, 0, 1, 0.05 },
   { "pitchDown", 0.25, 0, 1, 0.05 },
   { "pitchFlying", 0.75, 0, 1, 0.05 },
@@ -139,6 +140,7 @@ local function test_indoors_switch_and_intros_text()
   Assert.equal(introOf("Indoors"), "Camera used inside buildings and caves, in combat too.")
   Assert.equal(introOf("Combat"), "Camera used in combat. When off, combat uses the Indoors or On foot camera.")
   Assert.equal(introOf("Mounted"), "Camera used while mounted. When off, mounted uses the Indoors, Combat or On foot camera.")
+  Assert.equal(introOf("Camera feel"), "Head movement, plus focus and tilt strengths for situations that turn them on.")
 end
 
 local MAX_HINT = 90
@@ -178,6 +180,7 @@ local function test_units_per_spec()
     offsetTime = "s",
     focusYaw = "%",
     focusPitch = "%",
+    headMovement = "%",
     pitchStrength = "%",
     pitchDown = "%",
     pitchFlying = "%",

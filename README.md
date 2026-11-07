@@ -25,7 +25,7 @@
 Options > AddOns > Shoulder Cam, or type `/shouldercam` (or `/shc`). `/shc toggle` and `/shc swap` turn the camera on or off and swap the shoulder, and work in macros. Every change takes effect immediately. Hover any option to see what it does.
 
 - **General** tab: turn the addon on or off, zoom speeds, max camera distance and shoulder offset.
-- **Camera feel** tab: how strongly the camera turns toward your target and tilts.
+- **Camera feel** tab: how strongly the camera turns toward your target and tilts, and how much it follows your character's head movement.
 - **On foot**, **Indoors**, **Combat** and **Mounted** tabs: each situation's own camera. The Indoors camera (off by default) keeps the camera close inside buildings and caves. Druid travel forms can count as mounted.
 
 <p align="center">
