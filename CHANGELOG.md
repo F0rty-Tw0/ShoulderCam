@@ -6,6 +6,8 @@ All releases: **1.2.x (current)** · [1.1.x](archive/changelog/1.1.md) · [1.0.x
 
 ## [Unreleased]
 
+- Added Pause on flight paths and vehicles (on by default): the camera goes back behind you while you fly a flight path or ride a vehicle, and returns when the ride ends. Turn it off on the General tab.
+
 ## [1.2.0] - 2026-11-07
 
 - Added an Indoors camera: its own zoom distance, shoulder and tilt settings while you are inside buildings and caves. Off by default; turn it on in the new Indoors tab.

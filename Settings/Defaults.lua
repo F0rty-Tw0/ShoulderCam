@@ -27,6 +27,12 @@ local Defaults = {
       hint = "Turns the shoulder camera on or off. Off puts the camera back behind you; zoom stays.",
     },
     {
+      key = "pauseOnTaxi",
+      default = true,
+      label = "Pause on flight paths and vehicles",
+      hint = "Puts the camera back behind you on a flight path or in a vehicle.",
+    },
+    {
       key = "minimapButton",
       default = true,
       label = "Show minimap button",

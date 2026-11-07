@@ -17,6 +17,10 @@ local Mode = {
 -- around a doorway (same set DynamicCam uses).
 local INDOOR_EVENTS = { "ZONE_CHANGED_INDOORS", "ZONE_CHANGED", "ZONE_CHANGED_NEW_AREA", "SPELL_UPDATE_USABLE" }
 
+-- Taxi ends with PLAYER_CONTROL_GAINED; UnitInVehicle has its own enter/exit pair.
+local TAXI_EVENTS = { "PLAYER_CONTROL_LOST", "PLAYER_CONTROL_GAINED" }
+local VEHICLE_EVENTS = { "UNIT_ENTERED_VEHICLE", "UNIT_EXITED_VEHICLE" }
+
 local function countsAsMounted(db, state)
   if state.mounted then
     return true
@@ -27,6 +31,9 @@ end
 function Mode.Resolve(db, state)
   if not db.enabled then
     return "off"
+  end
+  if db.pauseOnTaxi and (state.taxi or state.vehicle) then
+    return "paused"
   end
   if db.mountedEnabled and countsAsMounted(db, state) then
     return "mounted"
@@ -46,10 +53,12 @@ function Mode.ReadState()
     combat = _G.UnitAffectingCombat("player") == true,
     formId = _G.GetShapeshiftFormID(),
     indoors = _G.IsIndoors ~= nil and _G.IsIndoors() == true,
+    taxi = _G.UnitOnTaxi ~= nil and _G.UnitOnTaxi("player") == true,
+    vehicle = _G.UnitInVehicle ~= nil and _G.UnitInVehicle("player") == true,
   }
 end
 
-function Mode.Events(db, isDruid, canDetectIndoors)
+function Mode.Events(db, isDruid, canDetectIndoors, canDetectVehicle)
   local events = { PLAYER_ENTERING_WORLD = true }
   if not db.enabled then
     return events
@@ -67,6 +76,16 @@ function Mode.Events(db, isDruid, canDetectIndoors)
   if db.indoorsEnabled and canDetectIndoors then
     for _, event in ipairs(INDOOR_EVENTS) do
       events[event] = true
+    end
+  end
+  if db.pauseOnTaxi then
+    for _, event in ipairs(TAXI_EVENTS) do
+      events[event] = true
+    end
+    if canDetectVehicle then
+      for _, event in ipairs(VEHICLE_EVENTS) do
+        events[event] = true
+      end
     end
   end
   return events

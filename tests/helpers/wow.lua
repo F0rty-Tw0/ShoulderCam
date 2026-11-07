@@ -69,7 +69,7 @@ local function addSliderMethods(widget)
   end
 end
 
-local function addFrameMethods(widget)
+local function addFrameMethods(widget, W)
   function widget:SetSize(width, height)
     self.width, self.height = width, height
   end
@@ -93,7 +93,11 @@ local function addFrameMethods(widget)
   function widget:SetAllPoints(target)
     self.allPoints = target
   end
+  -- Like the client, registering an event this flavor lacks throws.
   function widget:RegisterEvent(event)
+    if W.unknownEvents[event] then
+      error('Attempt to register unknown event "' .. event .. '"')
+    end
     self.events[event] = true
   end
   function widget:UnregisterEvent(event)
@@ -210,7 +214,7 @@ end
 -- Every stub frame carries every method; tests only call the ones that fit.
 local function newWidget(W, frameType, name, parent)
   local widget = { frameType = frameType, name = name, parent = parent, scripts = {}, events = {}, callbacks = {}, shown = true, enabled = true }
-  addFrameMethods(widget)
+  addFrameMethods(widget, W)
   addControlMethods(widget)
   addSliderMethods(widget)
   addButtonMethods(widget)
@@ -408,6 +412,17 @@ local function installPlayer(W)
   rawset(_G, "IsIndoors", function()
     return W.indoors == true
   end)
+  rawset(_G, "UnitOnTaxi", function(unit)
+    return unit == "player" and W.onTaxi == true
+  end)
+  rawset(_G, "UnitInVehicle", function(unit)
+    return unit == "player" and W.inVehicle == true
+  end)
+  rawset(_G, "C_EventUtils", {
+    IsEventValid = function(event)
+      return not W.unknownEvents[event]
+    end,
+  })
   rawset(_G, "UnitClass", function(_unit)
     return W.class, W.class, CLASS_IDS[W.class]
   end)
@@ -468,6 +483,7 @@ function Wow.Install()
     categories = {},
     addOnCategories = {},
     unregistered = {},
+    unknownEvents = {},
   }
 
   rawset(_G, "WOW_PROJECT_ID", 1)

@@ -4,6 +4,7 @@ local Defaults = require("ShoulderCam.Settings.Defaults")
 -- SPEC.md → Settings, one row per key: { key, default, min, max, step }.
 local SPEC = {
   { "enabled", true },
+  { "pauseOnTaxi", true },
   { "minimapButton", true },
   { "minimapAngle", 225 },
   { "scrollSpeed", 20, 1, 50, 1 },
@@ -75,8 +76,9 @@ local function test_minimap_entries_follow_enabled_in_general()
       index[entry.key] = i
     end
   end
-  Assert.equal(index.minimapButton, index.enabled + 1)
-  Assert.equal(index.minimapAngle, index.enabled + 2)
+  Assert.equal(index.pauseOnTaxi, index.enabled + 1)
+  Assert.equal(index.minimapButton, index.enabled + 2)
+  Assert.equal(index.minimapAngle, index.enabled + 3)
   Assert.equal(Defaults.byKey.minimapButton.label, "Show minimap button")
 end
 
