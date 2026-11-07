@@ -40,6 +40,7 @@ local EVENT_KEYS = {
   combatEnabled = true,
   mountedEnabled = true,
   indoorsEnabled = true,
+  pauseOnTaxi = true,
   druidForms = true,
   [DEFAULTS_KEY] = true,
 }
@@ -62,7 +63,7 @@ end
 
 local function updateEvents()
   local isDruid = select(2, _G.UnitClass("player")) == "DRUID"
-  local wanted = Mode.Events(db, isDruid, _G.IsIndoors ~= nil)
+  local wanted = Mode.Events(db, isDruid, _G.IsIndoors ~= nil, _G.UnitInVehicle ~= nil)
   for event in pairs(registered) do
     if not wanted[event] then
       frame:UnregisterEvent(event)
