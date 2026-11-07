@@ -62,6 +62,7 @@ read_globals = {
   -- Timers and client info
   "GetTime",
   "C_Timer",
+  "C_EventUtils",
   "GetBuildInfo",
   "WOW_PROJECT_ID",
   "WOW_PROJECT_MAINLINE",
