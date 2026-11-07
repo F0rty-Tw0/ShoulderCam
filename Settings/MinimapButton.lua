@@ -27,8 +27,8 @@ local ICON_SIZE = 18
 local BORDER_SIZE = 50
 
 -- Round button on the minimap edge (SPEC.md → Settings): left-click opens
--- the settings, right-click toggles the addon, a left drag moves it around
--- the edge. The frame is created the first time it must be shown; the drag
+-- the settings, right-click toggles the addon, middle-click swaps the
+-- shoulder, a left drag moves it around the edge. The frame is created the first time it must be shown; the drag
 -- ticker runs only while the button is held.
 local MinimapButton = {}
 
@@ -71,6 +71,8 @@ end
 local function onClick(_self, mouseButton)
   if mouseButton == "RightButton" then
     actions.toggle()
+  elseif mouseButton == "MiddleButton" then
+    actions.swap()
   else
     actions.open()
   end
@@ -82,6 +84,7 @@ local function showTooltip(self)
   tooltip:SetText(Localization.Text(Constants.DISPLAY_NAME))
   tooltip:AddLine(Localization.Text("Left-click: settings"))
   tooltip:AddLine(Localization.Text("Right-click: toggle on/off"))
+  tooltip:AddLine(Localization.Text("Middle-click: swap shoulder"))
   tooltip:Show()
 end
 
@@ -102,7 +105,7 @@ local function create()
   frame:SetSize(BUTTON_SIZE, BUTTON_SIZE)
   frame:SetFrameStrata(FRAME_STRATA)
   frame:SetFrameLevel(FRAME_LEVEL)
-  frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+  frame:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
   frame:RegisterForDrag("LeftButton")
   addTexture(frame, BACKGROUND, "BACKGROUND", BACKGROUND_SIZE):SetPoint("CENTER")
   addTexture(frame, ICON, "ARTWORK", ICON_SIZE):SetPoint("CENTER")
@@ -131,7 +134,7 @@ function MinimapButton.Refresh()
   end
 end
 
--- actions = { open = fn, toggle = fn }. Does nothing without a minimap.
+-- actions = { open = fn, toggle = fn, swap = fn }. Does nothing without a minimap.
 function MinimapButton.Install(settingsDb, buttonActions)
   minimap = _G.Minimap
   if not minimap then

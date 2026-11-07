@@ -6,6 +6,9 @@ All releases: **1.2.x (current)** · [1.1.x](archive/changelog/1.1.md) · [1.0.x
 
 ## [Unreleased]
 
+- Middle-click the minimap button to swap shoulders.
+- `/shc toggle` and `/shc swap` now say in chat what they changed.
+
 ## [1.2.0] - 2026-11-07
 
 - Added an Indoors camera: its own zoom distance, shoulder and tilt settings while you are inside buildings and caves. Off by default; turn it on in the new Indoors tab.
