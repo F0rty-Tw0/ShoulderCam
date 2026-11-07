@@ -106,6 +106,20 @@ local function test_no_vehicle_events_without_api()
   Assert.equal(Helper.frame(W):IsEventRegistered("PLAYER_CONTROL_LOST"), true)
 end
 
+local function test_events_unknown_to_the_client_are_skipped()
+  local W, db = Helper.setup()
+  db.pauseOnTaxi = false
+  Controller.OnSettingChanged("pauseOnTaxi")
+  W.unknownEvents.UNIT_ENTERED_VEHICLE = true
+
+  db.pauseOnTaxi = true
+  Controller.OnSettingChanged("pauseOnTaxi")
+
+  Assert.equal(Helper.frame(W):IsEventRegistered("UNIT_ENTERED_VEHICLE"), false)
+  Assert.equal(Helper.frame(W):IsEventRegistered("UNIT_EXITED_VEHICLE"), true)
+  Assert.equal(Helper.frame(W):IsEventRegistered("PLAYER_CONTROL_LOST"), true)
+end
+
 local function test_manual_zoom_while_paused_remembers_nothing()
   local W, db = setupOnFoot()
   W.onTaxi = true
@@ -126,5 +140,6 @@ return function()
   test_vehicle_ride_pauses_and_leaving_resumes()
   test_turning_option_off_while_paused_resumes_and_unregisters()
   test_no_vehicle_events_without_api()
+  test_events_unknown_to_the_client_are_skipped()
   test_manual_zoom_while_paused_remembers_nothing()
 end

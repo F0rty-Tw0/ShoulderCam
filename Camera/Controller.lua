@@ -23,7 +23,7 @@ local PITCH_CVAR = "test_cameraDynamicPitch"
 local ZOOM_SPEED_CVAR = "cameraZoomSpeed"
 local DEFAULTS_KEY = "*defaults"
 
--- Written on every apply while not Off: { CVar, setting key }.
+-- Written on every apply while not Off or Paused: { CVar, setting key }.
 local GLOBAL_CVARS = {
   { "test_cameraTargetFocusEnemyStrengthYaw", "focusYaw" },
   { "test_cameraTargetFocusInteractStrengthYaw", "focusYaw" },
@@ -71,7 +71,7 @@ local function updateEvents()
     end
   end
   for event in pairs(wanted) do
-    if not registered[event] then
+    if not registered[event] and FlavorCompat.IsEventKnown(event) then
       frame:RegisterEvent(event)
       registered[event] = true
     end
