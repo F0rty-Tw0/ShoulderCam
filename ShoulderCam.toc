@@ -15,7 +15,7 @@
 ## Author: F0rty_tw0
 ## Category: Camera
 ## IconTexture: Interface\AddOns\ShoulderCam\Media\Icon
-## Version: v1.2.0
+## Version: v1.3.0
 ## SavedVariables: ShoulderCamDB
 ## X-Curse-Project-ID: 1730929
 ## AddonCompartmentFunc: ShoulderCam_OnAddonCompartmentClick
